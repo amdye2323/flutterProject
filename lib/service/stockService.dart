@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:smart_select/smart_select.dart';
+import 'package:testflutter/DTO/PickingList.dart';
 import 'package:testflutter/DTO/User.dart';
+import 'package:testflutter/DTO/corCode.dart';
 
 import '../DTO/skuInfo.dart';
 
@@ -13,21 +15,21 @@ class stockService {
     "Accept": "application/json"
   };
 
-  Future<skuInfo> requestSkuInfo(String barcode) async {
-    String url = "http://172.30.1.1:8080/api/hello?barcode=${barcode}";
+  Future<List<skuInfo>> requestSkuInfo(String barcode) async {
+    String url = "${baseUrl}/api/barcode?barcode=${barcode}";
 
     var response = await http.get(url, headers: header);
 
     String responsBody = utf8.decode(response.bodyBytes);
-    var json = jsonDecode(responsBody);
+    var json = jsonDecode(responsBody)["list"].cast<Map<String, dynamic>>();
+    // var jsonList = json;
 
-    if (json["result"] == "nothing") {
+    var list = json.map<skuInfo>((json) => skuInfo.fromJson(json)).toList();
+
+    if (list.length == 0) {
       return Future.error("error");
     }
-    // skuInfo _sku = skuInfo(sku:json["sku"],corCode: json["corCode"],skuLabel: json["skuLabel"]);
-
-    return skuInfo(
-        sku: json["sku"], corCode: json["corCode"], skuLabel: json["skuLabel"]);
+    return list;
   }
 
   Future<User> loginUser(String id, String password) async {
@@ -43,45 +45,69 @@ class stockService {
     var json = jsonDecode(responsBody);
     print(json);
     if (json["result"] == "error") {
-      return null;
+      return Future.error("error");
     } else if (json["result"] == "passNot") {
-      return null;
+      return Future.error("error");
     } else if (json["result"] == "success") {
       return User(id: json["id"], name: json["name"]);
     }
     return null;
-    // print("Name : ${data.name} , Password : ${data.password} ");
-    // if(!users.containsKey(data.name)){
-    //     return 'Username not exits';
-    // }
-    // if(users[data.name] != data.password){
-    //     return 'Password does not match';
-    // }
-    // return null;
   }
 
   Future<List<S2Choice<String>>> getCorCode() async {
-    String url = "${baseUrl}/api/corCode";
+    String url = "${baseUrl}/api/corList";
     var response = await http.get(url, headers: header);
 
-    String resonseBody = utf8.decode(response.bodyBytes);
-    var json = jsonDecode(resonseBody);
-    List<S2Choice<String>> options = [
-      S2Choice<String>(value: "1", title: "1차"),
-      S2Choice<String>(value: "2", title: "2차"),
-      S2Choice<String>(value: "3", title: "3차"),
-      S2Choice<String>(value: "4", title: "4차"),
-      S2Choice<String>(value: "5", title: "5차"),
-    ];
-    if (json["result"] == "error") {
-      return null;
-    } else if (json["result"] == "success") {
-      var reList = json["list"] as Map<String, String>;
-      // reList.forEach((key, value) {
-      //   options.add(S2Choice(value: value, title: key));
-      // });
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody);
+    var jsonList = json["list"].cast<Map<String, dynamic>>();
+    var list = jsonList.map<corCode>((json) => corCode.fromJson(json)).toList();
+    List<S2Choice<String>> options = [];
+    if (json["result"] == "success") {
+      for (var i = 0; i < list.length; i++) {
+        options.add(S2Choice(
+            value: list[i].subcode.toString(),
+            title: list[i].codename.toString()));
+      }
       return options;
     }
-    return options;
+    return null;
+  }
+
+  Future<List<PickingList>> getPickList(
+      String currentDate, String corCode, String step) async {
+    String url =
+        "${baseUrl}/api/pickingList?pickingDate=${currentDate}&corCode=${corCode}&step=${step}";
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody);
+    var jsonList = json["list"].cast<Map<String, dynamic>>();
+
+    var list = jsonList
+        .map<PickingList>((json) => PickingList.fromJson(json))
+        .toList();
+    if (json["result"] == "success") {
+      return list;
+    }
+    return null;
+  }
+
+  Future<List<String>> getResultCorcodeList(
+      List<String> barcodeList, String userId) async {
+    print(barcodeList);
+    String url =
+        "${baseUrl}/api/resulCorcodeList?barcodeList=${barcodeList}&userId=${userId}";
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody);
+    var list = json["list"].cast<List<String>>();
+
+    if (json["result"] == "success") {
+      return list;
+    } else {
+      return Future.error("error");
+    }
   }
 }

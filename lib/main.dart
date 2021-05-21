@@ -4,14 +4,13 @@ import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/pick.dart';
 import 'package:testflutter/src/LoginScreen.dart';
 
-import 'MyHomePage.dart';
-
 void main() => runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(
           create: (context) => UserModel("", ""),
         ),
-        Provider(create: (context) => pickRequirement("", "", "")),
+        ChangeNotifierProvider(
+            create: (context) => pickRequirement("", "", "")),
       ],
       child: MaterialApp(
         home: MyApp(),
@@ -35,7 +34,6 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
-        'a': (context) => MyHome(),
       },
     );
   }

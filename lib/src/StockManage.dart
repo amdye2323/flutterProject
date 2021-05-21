@@ -21,14 +21,22 @@ class _StockManageState extends State<StockManage> {
   DateTime currentTime = DateTime.now();
   final _dateEditController = TextEditingController();
   String corCode = "";
+  String corName = "None";
   String step = "1";
 
+  Future<List<S2Choice<String>>> corList;
+
+  void initState() {
+    super.initState();
+    corList = _corSelFuture(context);
+  }
+
   List<S2Choice<String>> options = [
-    S2Choice<String>(value: "1", title: "1차"),
-    S2Choice<String>(value: "2", title: "2차"),
-    S2Choice<String>(value: "3", title: "3차"),
-    S2Choice<String>(value: "4", title: "4차"),
-    S2Choice<String>(value: "5", title: "5차"),
+    S2Choice<String>(value: "1", title: "STEP 1"),
+    S2Choice<String>(value: "2", title: "STEP 2"),
+    S2Choice<String>(value: "3", title: "STEP 3"),
+    S2Choice<String>(value: "4", title: "STEP 4"),
+    S2Choice<String>(value: "5", title: "STEP 5"),
   ];
 
   /**
@@ -39,7 +47,7 @@ class _StockManageState extends State<StockManage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          "차수 선택",
+          "Select Request Step ",
           style: kLabelStyle,
           textAlign: TextAlign.center,
         ),
@@ -65,31 +73,36 @@ class _StockManageState extends State<StockManage> {
    */
   Widget corCodeSelect(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          "업체 선택",
+          "Company Select",
           style: kLabelStyle,
           textAlign: TextAlign.center,
         ),
         SizedBox(
           height: 10.0,
         ),
-        FutureBuilder(
-            future: _corSelFuture(context),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return SmartSelect<String>.single(
-                    title: "${corCode}", value: value, onChange: onChange);
-              } else if (snapshot.hasError) {
-                return Text("error");
-              }
-            }),
-        SmartSelect<String>.single(
-            title: "${corCode}",
-            choiceItems: _corSelFuture(context),
-            value: corCode,
-            onChange: (state) => setState(() => corCode = state.value))
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: FutureBuilder(
+              future: corList,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return SmartSelect<String>.single(
+                      title: "${corName}",
+                      choiceItems: snapshot.data,
+                      value: corCode,
+                      onChange: (state) =>
+                          setState(() => corCode = state.value));
+                } else if (snapshot.hasError) {
+                  return Text("업체가 존재하지 않습니다.");
+                }
+                return CircularProgressIndicator();
+              }),
+        ),
       ],
     );
   }
@@ -153,8 +166,6 @@ class _StockManageState extends State<StockManage> {
     return MaterialApp(
         home: Scaffold(
       body: GestureDetector(
-        onDoubleTap: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => pickListView())),
         child: Stack(
           children: <Widget>[
             Container(
@@ -182,11 +193,11 @@ class _StockManageState extends State<StockManage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(
-                      height: 30.0,
-                    ),
+                    // SizedBox(
+                    //   height: 30.0,
+                    // ),
                     Text(
-                      "피킹 조회",
+                      "PICKING LIST",
                       style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'OpenSans',
@@ -221,9 +232,17 @@ class _StockManageState extends State<StockManage> {
                               DateFormat('yyyy-MM-dd').format(currentTime);
                           Provider.of<pickRequirement>(context, listen: false)
                               .setPickRequirment(pi);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => pickListView()));
                         },
-                        child: Text(
-                          "조회하기",
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(CupertinoIcons.arrow_right_circle),
+                            Text("조회하기")
+                          ],
                         )),
                   ],
                 ),

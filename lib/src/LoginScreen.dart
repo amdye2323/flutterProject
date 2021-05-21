@@ -259,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => MainPage()));
           },
-          onTap: () => FocusScope.of(context).unfocus(),
+          // onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
               Container(
@@ -284,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
-                    horizontal: 40.0,
+                    horizontal: 60.0,
                     vertical: 120.0,
                   ),
                   child: Column(
