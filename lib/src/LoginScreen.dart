@@ -7,29 +7,6 @@ import 'package:testflutter/Home/HomeViewModel.dart';
 import '../main.dart';
 import 'MainPage.dart';
 
-// class LoginScreen extends StatelessWidget {
-//   Duration get loginTime => Duration(milliseconds: 2250);
-//
-//   final _viewModel = HomeViewModel();
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return FlutterLogin(
-//         title: "GOLINK",
-//         onLogin: _viewModel.loginUser,
-//         onSubmitAnimationCompleted: (){
-//           Navigator.of(context).pushReplacement(MaterialPageRoute(
-//               builder: (context) => AddScreen()
-//           ));
-//         },
-//         messages: LoginMessages(
-//           usernameHint: "아이디",
-//         ),
-//         emailValidator: (widget) => "${widget}"
-//     );
-//   }
-// }
-
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -41,6 +18,17 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passTextEditController = TextEditingController();
   final _viewModel = HomeViewModel();
   var _error_message = "";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    String userId = Provider.of<UserModel>(context, listen: false).userId;
+    print(userId);
+    if (userId != "") {
+      Navigator.pop(context, MainPage());
+    }
+  }
 
   @override
   void dispose() {
@@ -179,8 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
             _error_message = "아이디와 비밀번호를 확인해주세요.";
           } else {
             Provider.of<UserModel>(context, listen: false).setUser(result);
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => MainPage()));
+            Navigator.popAndPushNamed(context, 'MainPage');
           }
         },
         padding: EdgeInsets.all(15.0),
@@ -202,53 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSignInWithText() {
-    return Column(
-      children: <Widget>[
-        Text(
-          '- OR -',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        SizedBox(height: 20.0),
-        Text(
-          'Sign in with',
-          style: kLabelStyle,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSignupBtn() {
-    return GestureDetector(
-      onTap: () => print('Sign Up Button Pressed'),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: 'Don\'t have an Account? ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            TextSpan(
-              text: 'Sign Up',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -256,29 +196,12 @@ class _LoginScreenState extends State<LoginScreen> {
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onDoubleTap: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => MainPage()));
+            Navigator.popAndPushNamed(context, 'MainPage');
           },
           // onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF73AEF5),
-                      Color(0xFF61A4F1),
-                      Color(0xFF478DE0),
-                      Color(0xFF398AE5),
-                    ],
-                    stops: [0.1, 0.4, 0.7, 0.9],
-                  ),
-                ),
-              ),
+              backWallpaper(),
               Container(
                 height: double.infinity,
                 child: SingleChildScrollView(

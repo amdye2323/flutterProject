@@ -19,12 +19,11 @@ class StockManage extends StatefulWidget {
 class _StockManageState extends State<StockManage> {
   final _viewModel = HomeViewModel();
   DateTime currentTime = DateTime.now();
-  final _dateEditController = TextEditingController();
   String corCode = "";
-  String corName = "None";
+  String corCodeName = "선택해주세요";
   String step = "1";
 
-  Future<List<S2Choice<String>>> corList;
+  Future<List<Map<String, String>>> corList;
 
   void initState() {
     super.initState();
@@ -57,7 +56,7 @@ class _StockManageState extends State<StockManage> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
-          height: 60.0,
+          height: 50.0,
           child: SmartSelect<String>.single(
               title: "${step}차",
               choiceItems: options,
@@ -86,17 +85,24 @@ class _StockManageState extends State<StockManage> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
-          height: 60.0,
+          height: 50.0,
           child: FutureBuilder(
               future: corList,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return SmartSelect<String>.single(
-                      title: "${corName}",
-                      choiceItems: snapshot.data,
-                      value: corCode,
-                      onChange: (state) =>
-                          setState(() => corCode = state.value));
+                      title: corCodeName,
+                      choiceItems: S2Choice.listFrom(
+                        source: snapshot.data,
+                        value: (index, item) => item['value'],
+                        title: (index, item) => item['title'],
+                      ),
+                      onChange: (state) {
+                        setState(() {
+                          corCode = state.value;
+                          corCodeName = state.valueTitle;
+                        });
+                      });
                 } else if (snapshot.hasError) {
                   return Text("업체가 존재하지 않습니다.");
                 }
@@ -133,10 +139,10 @@ class _StockManageState extends State<StockManage> {
             child: Text(
               DateFormat('yyyy-MM-dd').format(currentTime),
               style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'OpenSans',
-              ),
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'OpenSans',
+                  fontSize: 16.0),
             ),
           ),
         )
@@ -157,7 +163,7 @@ class _StockManageState extends State<StockManage> {
     }
   }
 
-  Future<List<S2Choice<String>>> _corSelFuture(BuildContext context) async {
+  Future<List<Map<String, String>>> _corSelFuture(BuildContext context) async {
     return await _viewModel.getCorCode();
   }
 
@@ -168,22 +174,7 @@ class _StockManageState extends State<StockManage> {
       body: GestureDetector(
         child: Stack(
           children: <Widget>[
-            Container(
-              height: double.infinity,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF73AEF5),
-                  Color(0xFF61A4F1),
-                  Color(0xFF478DE0),
-                  Color(0xFF398AE5),
-                ],
-                stops: [0.1, 0.4, 0.7, 0.9],
-              )),
-            ),
+            backWallpaper(),
             Container(
               height: double.infinity,
               child: SingleChildScrollView(
@@ -193,9 +184,6 @@ class _StockManageState extends State<StockManage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    // SizedBox(
-                    //   height: 30.0,
-                    // ),
                     Text(
                       "PICKING LIST",
                       style: TextStyle(
@@ -219,31 +207,38 @@ class _StockManageState extends State<StockManage> {
                     SizedBox(
                       height: 30.0,
                     ),
-                    ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.white,
-                            onPrimary: Colors.black,
-                            elevation: 5),
-                        onPressed: () {
-                          pickVO pi = pickVO();
-                          pi.step = step;
-                          pi.corCode = corCode;
-                          pi.pickingDate =
-                              DateFormat('yyyy-MM-dd').format(currentTime);
-                          Provider.of<pickRequirement>(context, listen: false)
-                              .setPickRequirment(pi);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => pickListView()));
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(CupertinoIcons.arrow_right_circle),
-                            Text("조회하기")
-                          ],
-                        )),
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 0, horizontal: 50.0),
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              primary: Colors.white,
+                              onPrimary: Colors.blue,
+                              elevation: 5),
+                          onPressed: () {
+                            pickVO pi = pickVO();
+                            pi.step = step;
+                            pi.corCode = corCode;
+                            pi.pickingDate =
+                                DateFormat('yyyy-MM-dd').format(currentTime);
+                            Provider.of<pickRequirement>(context, listen: false)
+                                .setPickRequirment(pi);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => pickListView()));
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Icon(CupertinoIcons.arrow_right_circle),
+                              Text("조회하기")
+                            ],
+                          )),
+                    ),
+                    SizedBox(
+                      height: 30.0,
+                    ),
                   ],
                 ),
               ),

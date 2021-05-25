@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/pick.dart';
 import 'package:testflutter/src/LoginScreen.dart';
+import 'package:testflutter/src/MainPage.dart';
 
 void main() => runApp(MultiProvider(
       providers: [
@@ -18,8 +19,8 @@ void main() => runApp(MultiProvider(
     ));
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key key}) : super(key: key);
-
+  // const MyApp({Key key}) : super(key: key);
+  String routNumber = "/";
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -31,12 +32,21 @@ class MyApp extends StatelessWidget {
           elevation: 0.0,
         ),
       ),
-      initialRoute: '/',
+      initialRoute:
+          Provider.of<UserModel>(context, listen: false).userId.toString() == ""
+              ? routNumber = '/'
+              : routNumber = 'MainPage',
       routes: {
         '/': (context) => LoginScreen(),
+        "MainPage": (context) => MainPage(),
       },
     );
   }
+}
+
+Future<String> _checkUser(context) async {
+  String userId = Provider.of<UserModel>(context, listen: false).userId;
+  return await userId;
 }
 
 class UserModel extends ChangeNotifier {
@@ -86,4 +96,24 @@ class pickRequirement extends ChangeNotifier {
     _step = "";
     notifyListeners();
   }
+}
+
+Widget backWallpaper() {
+  return Container(
+    height: double.infinity,
+    width: double.infinity,
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0xFF73AEF5),
+          Color(0xFF61A4F1),
+          Color(0xFF478DE0),
+          Color(0xFF398AE5),
+        ],
+        stops: [0.1, 0.4, 0.7, 0.9],
+      ),
+    ),
+  );
 }

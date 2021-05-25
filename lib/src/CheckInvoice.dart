@@ -8,6 +8,7 @@ import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:testflutter/DTO/barcodeCheckList.dart';
 import 'package:testflutter/Home/HomeViewModel.dart';
 
 import '../main.dart';
@@ -29,7 +30,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    barcodeCorList = getResultCorcodeList();
+    // barcodeCorList = getResultCorcodeList();
   }
 
   void addList() {
@@ -46,12 +47,12 @@ class _CheckInvoiceState extends State<CheckInvoice> {
     setState(() {});
   }
 
-  Future<List<String>> getResultCorcodeList() async {
+  Future<List<barcodeCheckList>> getResultCorcodeList() async {
     String userId = Provider.of<UserModel>(context, listen: false).userId;
     return await _viewModel.getResultCorcodeList(_checkBarcodeList, userId);
   }
 
-  void FlutterDialog() {
+  void FlutterDialog(BuildContext context) {
     showDialog(
         context: context,
         barrierDismissible: false, //Dialog를 제외한 곳 터치시 x
@@ -61,22 +62,64 @@ class _CheckInvoiceState extends State<CheckInvoice> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0)),
             title: Column(
-              children: <Widget>[Text("조회 결과")],
+              children: <Widget>[Text("등록 결과")],
             ),
-            content: FutureBuilder<List<String>>(
-              future: getResultCorcodeList(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return Text("데이터가 없습니다");
-                } else if (snapshot.hasError) {
-                  return Text("에러입니다.");
-                } else {
-                  return CircularProgressIndicator();
-                }
-              },
+            content: Container(
+              height: 300,
+              width: 300,
+              child: FutureBuilder<List<barcodeCheckList>>(
+                future: getResultCorcodeList(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Text("데이터가 없습니다");
+                  } else if (snapshot.hasError) {
+                    return Text("에러입니다.");
+                  } else if (snapshot.hasData) {
+                    return Flex(
+                      direction: Axis.vertical,
+                      children: <Widget>[
+                        Expanded(
+                          child: GridView.builder(
+                              scrollDirection: Axis.vertical,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2),
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GridTileBar(
+                                  subtitle: Text(
+                                    "${snapshot.data[index].barcode}",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'OpenSans',
+                                    ),
+                                  ),
+                                  title: Text(
+                                    "${snapshot.data[index].checkResult}",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'OpenSans',
+                                    ),
+                                  ),
+                                );
+                              }),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                },
+              ),
             ),
             actions: <Widget>[
-              ElevatedButton(onPressed: () {}, child: Text("등록하기"))
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("확인"))
             ],
           );
         });
@@ -127,41 +170,68 @@ class _CheckInvoiceState extends State<CheckInvoice> {
     return MaterialApp(
       home: Scaffold(
           body: Builder(builder: (BuildContext context) {
-            return Container(
-              alignment: Alignment.center,
-              child: Flex(
-                direction: Axis.vertical,
-                children: <Widget>[
-                  _checkBarcodeList.length == 0
-                      ? ElevatedButton(
-                          onPressed: () => startBarcodeScanStream(),
-                          child: Text('송장번호 체크'))
-                      : Text("리스트"),
-                  Expanded(
-                      child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, childAspectRatio: 4.0),
-                      itemBuilder: (BuildContext context, int index) {
-                        return GridTileBar(
-                          backgroundColor: Colors.lightBlue,
-                          leading: Icon(CupertinoIcons.barcode),
-                          title: Text(
-                            "${_checkBarcodeList[index]}",
-                            textAlign: TextAlign.center,
-                          ),
-                          trailing: IconButton(
-                            onPressed: () => deleteItemList(index),
-                            icon: Icon(CupertinoIcons.delete),
-                          ),
-                        );
-                      },
-                      itemCount: _checkBarcodeList.length,
-                    ),
-                  )),
-                ],
-              ),
+            return Stack(
+              children: [
+                backWallpaper(),
+                Container(
+                  alignment: Alignment.center,
+                  height: double.infinity,
+                  child: Flex(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    direction: Axis.vertical,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 60.0,
+                      ),
+                      _checkBarcodeList.length == 0
+                          ? ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Colors.white)),
+                              onPressed: () => startBarcodeScanStream(),
+                              child: Text(
+                                '송장번호 체크',
+                                style: TextStyle(color: Colors.blue),
+                              ))
+                          : TextButton(
+                              onPressed: () {
+                                FlutterDialog(context);
+                              },
+                              child: Text(
+                                "송장번호 리스트",
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  color: Colors.white,
+                                ),
+                              )),
+                      Expanded(
+                          child: Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2, childAspectRatio: 4.0),
+                          itemBuilder: (BuildContext context, int index) {
+                            return GridTileBar(
+                              backgroundColor: Colors.lightBlue,
+                              leading: Icon(CupertinoIcons.barcode),
+                              title: Text(
+                                "${_checkBarcodeList[index]}",
+                                textAlign: TextAlign.center,
+                              ),
+                              trailing: IconButton(
+                                onPressed: () => deleteItemList(index),
+                                icon: Icon(CupertinoIcons.delete),
+                              ),
+                            );
+                          },
+                          itemCount: _checkBarcodeList.length,
+                        ),
+                      )),
+                    ],
+                  ),
+                ),
+              ],
             );
           }),
           floatingActionButton: SpeedDial(
@@ -176,8 +246,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
               SpeedDialChild(
                   labelBackgroundColor: Colors.blue,
                   onTap: () {
-                    FlutterDialog();
-                    // getResultCorcodeList();
+                    FlutterDialog(context);
                   },
                   child: Icon(CupertinoIcons.search)),
               SpeedDialChild(
