@@ -8,7 +8,7 @@ import 'package:testflutter/src/MainPage.dart';
 void main() => runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => UserModel("", ""),
+          create: (context) => UserModel("", "", ""),
         ),
         ChangeNotifierProvider(
             create: (context) => pickRequirement("", "", "")),
@@ -51,12 +51,14 @@ Future<String> _checkUser(context) async {
 
 class UserModel extends ChangeNotifier {
   String _id = "";
+  String _password = "";
   String _name = "";
 
-  UserModel(this._id, this._name);
+  UserModel(this._id, this._password, this._name);
 
   void setUser(User user) {
     _id = user.id;
+    _password = user.password;
     _name = user.name;
     notifyListeners();
   }
@@ -65,9 +67,12 @@ class UserModel extends ChangeNotifier {
 
   String get userName => _name.toString();
 
+  String get userPassword => _password.toString();
+
   void popUser() {
     _id = "";
     _name = "";
+    _password = "";
     notifyListeners();
   }
 }

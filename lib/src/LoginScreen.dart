@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:testflutter/Home/HomeViewModel.dart';
 
+import '../DTO/User.dart';
 import '../main.dart';
-import 'MainPage.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -18,15 +19,27 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passTextEditController = TextEditingController();
   final _viewModel = HomeViewModel();
   var _error_message = "";
+  String userInfo = "";
+
+  static final storage = FlutterSecureStorage();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    String userId = Provider.of<UserModel>(context, listen: false).userId;
-    print(userId);
-    if (userId != "") {
-      Navigator.pop(context, MainPage());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _asyncMethod();
+    });
+  }
+
+  _asyncMethod() async {
+    userInfo = await storage.read(key: "login");
+    if (userInfo != "") {
+      User user = User();
+      user.id = userInfo.split(" ")[1];
+      user.password = userInfo.split(" ")[3];
+      Provider.of<UserModel>(context, listen: false).setUser(user);
+      Navigator.popAndPushNamed(context, 'MainPage');
     }
   }
 
@@ -166,6 +179,12 @@ class _LoginScreenState extends State<LoginScreen> {
           if (result == null) {
             _error_message = "아이디와 비밀번호를 확인해주세요.";
           } else {
+            await storage.write(
+                key: "login",
+                value: "id" +
+                    _idTextEditController.text.toString() +
+                    " " +
+                    _passTextEditController.text.toString());
             Provider.of<UserModel>(context, listen: false).setUser(result);
             Navigator.popAndPushNamed(context, 'MainPage');
           }

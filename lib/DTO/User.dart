@@ -1,14 +1,11 @@
 class User {
+  String id;
+  String name;
+  String password;
 
-  final String id ;
-  final String name;
+  User({this.id, this.name, this.password});
 
-  User({this.id,this.name});
-
-  factory User.fromJson(Map<String,dynamic> json){
-    return User(
-      id: json['id'],
-      name: json['name']
-    );
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(id: json['id'], name: json['name'], password: json['password']);
   }
 }

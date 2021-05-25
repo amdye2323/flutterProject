@@ -33,6 +33,11 @@ class _StockMoveState extends State<StockMove> {
   Future<String> result;
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -81,7 +86,6 @@ class _StockMoveState extends State<StockMove> {
                     _scanBarcode = barcodeScanRes;
                     skuDetail = _viewModel.skuDetail(_scanBarcode);
                     barcodeStatus = true;
-                    dispose();
                   });
                 } else {
                   _scanBarcode = "default";
@@ -93,7 +97,6 @@ class _StockMoveState extends State<StockMove> {
                   setState(() {
                     _zoneBarcode = barcodeScanRes;
                     barZone = _viewModel.getBarcodeZone(_zoneBarcode);
-                    dispose();
                   });
                 } else {
                   showToastInstance("대상 지역이 아닙니다.");

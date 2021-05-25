@@ -39,11 +39,6 @@ class stockService {
    * 로그인
    */
   Future<User> loginUser(String id, String password) async {
-    const users = const {
-      'test123@naver.com': 'test123',
-      'sub123@google.com': 'sub123',
-    };
-
     String url = "${baseUrl}/api/login?id=${id}&password=${password}";
     var response = await http.get(url, headers: header);
 
@@ -55,7 +50,8 @@ class stockService {
     } else if (json["result"] == "passNot") {
       return Future.error("error");
     } else if (json["result"] == "success") {
-      return User(id: json["id"], name: json["name"]);
+      return User(
+          id: json["id"], name: json["name"], password: json['password']);
     }
     return null;
   }

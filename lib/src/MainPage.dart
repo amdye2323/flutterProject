@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:testflutter/src/CheckInvoice.dart';
 import 'package:testflutter/src/StockManage.dart';
@@ -28,6 +29,7 @@ class MainFulPage extends StatefulWidget {
 
 class _MainFulPageState extends State<MainFulPage> {
   int screenIndex = 0;
+  static final storage = FlutterSecureStorage();
   static List<Widget> _widgetOptions = [
     FirstWidget(),
     StockManage(),
@@ -55,13 +57,24 @@ class _MainFulPageState extends State<MainFulPage> {
                 actions: <Widget>[
                   Padding(
                     padding:
-                        EdgeInsets.symmetric(horizontal: 0, vertical: 10.0),
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
                     child: IconButton(
                       onPressed: () {},
                       icon: const Icon(Icons.add_alert),
                       tooltip: 'Notice User Info',
                     ),
                   ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
+                    child: IconButton(
+                      icon: const Icon(CupertinoIcons.clear),
+                      onPressed: () {
+                        storage.delete(key: 'login');
+                        Navigator.popAndPushNamed(context, '/');
+                      },
+                    ),
+                  )
                 ],
               ),
               body: Center(
