@@ -14,9 +14,7 @@ class HomeViewModel {
   }
 
   Future<User> loginUser(String id, String password) async {
-    return Future.delayed(Duration(seconds: 1), () async {
-      return await _service.loginUser(id, password);
-    });
+    return await _service.loginUser(id, password);
   }
 
   Future<List<Map<String, String>>> getCorCode() async {

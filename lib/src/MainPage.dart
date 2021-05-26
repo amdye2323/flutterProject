@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:testflutter/src/CheckInvoice.dart';
+import 'package:testflutter/src/LoginScreen.dart';
 import 'package:testflutter/src/StockManage.dart';
 import 'package:testflutter/src/StockMove.dart';
 
@@ -43,6 +44,17 @@ class _MainFulPageState extends State<MainFulPage> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  Future deleteSecureDate(String key) async {
+    var deleteData = await storage.delete(key: key);
+    return deleteData;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 4,
@@ -70,8 +82,13 @@ class _MainFulPageState extends State<MainFulPage> {
                     child: IconButton(
                       icon: const Icon(CupertinoIcons.clear),
                       onPressed: () {
-                        storage.delete(key: 'login');
-                        Navigator.popAndPushNamed(context, '/');
+                        var delRE = deleteSecureDate('login');
+                        Provider.of<UserModel>(context, listen: false)
+                            .popUser();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()));
                       },
                     ),
                   )
@@ -153,7 +170,7 @@ class FirstWidget extends StatelessWidget {
                                 child: ListTile(
                                     leading: Icon(
                                       CupertinoIcons.tag,
-                                      color: Colors.blue,
+                                      color: Color(0xFF527DAA),
                                     ),
                                     title: Text(
                                       "접속자 아이디 : ${user.userId}",
@@ -164,7 +181,7 @@ class FirstWidget extends StatelessWidget {
                                 child: ListTile(
                                     leading: Icon(
                                       CupertinoIcons.person_alt,
-                                      color: Colors.blue,
+                                      color: Color(0xFF527DAA),
                                     ),
                                     title: Text(
                                       "접속자 이름 : ${user.userName}",

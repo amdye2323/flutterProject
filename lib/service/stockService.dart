@@ -136,8 +136,8 @@ class stockService {
     var jsonList = jsonDecode(responsBody)["list"];
 
     BarcodeZone zone = BarcodeZone();
-    zone.useStatus = jsonList["useStatus"];
     zone.storageZone = jsonList["storageZone"];
+    zone.statusZone = jsonList["statusZone"];
     zone.storageZoneBarcode = jsonList["storageZoneBarcode"];
 
     if (json["result"] != "success") {

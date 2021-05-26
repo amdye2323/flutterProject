@@ -19,8 +19,8 @@ void main() => runApp(MultiProvider(
     ));
 
 class MyApp extends StatelessWidget {
-  // const MyApp({Key key}) : super(key: key);
-  String routNumber = "/";
+  const MyApp({Key key}) : super(key: key);
+  // String routNumber = "/";
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,10 +32,7 @@ class MyApp extends StatelessWidget {
           elevation: 0.0,
         ),
       ),
-      initialRoute:
-          Provider.of<UserModel>(context, listen: false).userId.toString() == ""
-              ? routNumber = '/'
-              : routNumber = 'MainPage',
+      initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
         "MainPage": (context) => MainPage(),

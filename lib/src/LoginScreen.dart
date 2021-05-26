@@ -21,25 +21,26 @@ class _LoginScreenState extends State<LoginScreen> {
   var _error_message = "";
   String userInfo = "";
 
-  static final storage = FlutterSecureStorage();
+  final storage = FlutterSecureStorage();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _asyncMethod();
     });
   }
 
   _asyncMethod() async {
     userInfo = await storage.read(key: "login");
-    if (userInfo != "") {
+    if (userInfo != null) {
       User user = User();
       user.id = userInfo.split(" ")[1];
       user.password = userInfo.split(" ")[3];
+      user.name = userInfo.split(" ")[5];
       Provider.of<UserModel>(context, listen: false).setUser(user);
-      Navigator.popAndPushNamed(context, 'MainPage');
+      Navigator.pushNamed(context, 'MainPage');
     }
   }
 
@@ -179,12 +180,18 @@ class _LoginScreenState extends State<LoginScreen> {
           if (result == null) {
             _error_message = "아이디와 비밀번호를 확인해주세요.";
           } else {
-            await storage.write(
-                key: "login",
-                value: "id" +
-                    _idTextEditController.text.toString() +
-                    " " +
-                    _passTextEditController.text.toString());
+            if (_rememberMe == true) {
+              storage.write(
+                  key: "login",
+                  value: "id " +
+                      _idTextEditController.text.toString() +
+                      " " +
+                      "password " +
+                      _passTextEditController.text.toString() +
+                      " " +
+                      "name " +
+                      result.name.toString());
+            }
             Provider.of<UserModel>(context, listen: false).setUser(result);
             Navigator.popAndPushNamed(context, 'MainPage');
           }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cupertino_radio_choice/cupertino_radio_choice.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,7 @@ import '../main.dart';
 
 class StockMove extends StatefulWidget {
   const StockMove({Key key}) : super(key: key);
+
   @override
   _StockMoveState createState() => _StockMoveState();
 }
@@ -22,20 +24,22 @@ class _StockMoveState extends State<StockMove> {
   //재고 바코드
   String _scanBarcode = "default";
   String _zoneBarcode = "default";
+  String _firstRadio = "지정구역";
   String _bb = "";
   bool barcodeStatus = false;
   final _viewModel = HomeViewModel();
   final qtyController = TextEditingController();
 
+  final Map<String, String> genderMap = {
+    '지정구역': '지정구역',
+    '거래선출고': '거래선출고',
+    '피킹구역': '피킹구역'
+  };
+
   int count = 0;
   Future<List<skuInfo>> skuDetail;
   Future<BarcodeZone> barZone;
   Future<String> result;
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   void initState() {
@@ -46,6 +50,12 @@ class _StockMoveState extends State<StockMove> {
     result = _viewModel.stockMoveToZone(_scanBarcode, _zoneBarcode, userId);
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
   void pageReset() {
     barcodeStatus = false;
     _scanBarcode = "default";
@@ -54,6 +64,7 @@ class _StockMoveState extends State<StockMove> {
     setState(() {
       skuDetail = _viewModel.skuDetail(_scanBarcode);
       result = _viewModel.stockMoveToZone(_scanBarcode, _zoneBarcode, userId);
+      _firstRadio = "지정구역";
     });
   }
 
@@ -68,12 +79,19 @@ class _StockMoveState extends State<StockMove> {
     }
   }
 
+  void onActionSelected(String key) {
+    setState(() {
+      _firstRadio = key;
+    });
+  }
+
   Future<void> startBarcodeScanStream() async {
     String barcodeScanRes;
     try {
-      FlutterBarcodeScanner.getBarcodeStreamReceiver(
-              "#ff6666", "Cancel", false, ScanMode.BARCODE)
-          .listen((barcode) {
+      var con1 = FlutterBarcodeScanner.getBarcodeStreamReceiver(
+          "#ff6666", "Cancel", false, ScanMode.BARCODE);
+
+      con1.listen((barcode) {
         int barcodeSize = barcode.toString().length;
         _bb = barcode;
         Future<void> del(String bb) async {
@@ -200,7 +218,7 @@ class _StockMoveState extends State<StockMove> {
                                 padding: EdgeInsets.all(30.0),
                                 child: Column(
                                   children: [
-                                    normalTitle("대상 재고"),
+                                    normalTitle("스캔 재고"),
                                     SizedBox(
                                       height: 10.0,
                                     ),
@@ -221,7 +239,12 @@ class _StockMoveState extends State<StockMove> {
                                       size: 40,
                                       color: Colors.white,
                                     ),
-                                    normalTitle("대상 구역"),
+                                    // normalTitle("대상 구역"),
+                                    CupertinoRadioChoice(
+                                        notSelectedColor: Colors.white70,
+                                        choices: genderMap,
+                                        onChange: onActionSelected,
+                                        initialKeyValue: _firstRadio),
                                     SizedBox(
                                       height: 10.0,
                                     ),
@@ -248,7 +271,7 @@ class _StockMoveState extends State<StockMove> {
                                                       "${snapshot.data.storageZone}",
                                                       CupertinoIcons.tag_fill),
                                                   normalCard(
-                                                      "${snapshot.data.useStatus}",
+                                                      "${snapshot.data.statusZone}",
                                                       CupertinoIcons.eye_fill),
                                                   SizedBox(
                                                     height: 20.0,
@@ -274,7 +297,7 @@ class _StockMoveState extends State<StockMove> {
               alignment: Alignment.bottomCenter,
               child: FloatingActionButton(
                 backgroundColor: Colors.white,
-                onPressed: startBarcodeScanStream,
+                onPressed: scanBarcodeNormal,
                 child: Icon(
                   CupertinoIcons.barcode,
                   color: Colors.blue,
