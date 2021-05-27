@@ -30,12 +30,20 @@ class _StockManageState extends State<StockManage> {
     corList = _corSelFuture(context);
   }
 
-  List<S2Choice<String>> options = [
-    S2Choice<String>(value: "1", title: "STEP 1"),
-    S2Choice<String>(value: "2", title: "STEP 2"),
-    S2Choice<String>(value: "3", title: "STEP 3"),
-    S2Choice<String>(value: "4", title: "STEP 4"),
-    S2Choice<String>(value: "5", title: "STEP 5"),
+  // List<S2Choice<String>> options = [
+  //   S2Choice<String>(value: "1", title: "STEP 1"),
+  //   S2Choice<String>(value: "2", title: "STEP 2"),
+  //   S2Choice<String>(value: "3", title: "STEP 3"),
+  //   S2Choice<String>(value: "4", title: "STEP 4"),
+  //   S2Choice<String>(value: "5", title: "STEP 5"),
+  // ];
+
+  List<Map<String, String>> options = [
+    {'value': '1', 'title': 'STEP 1'},
+    {'value': '2', 'title': 'STEP 2'},
+    {'value': '3', 'title': 'STEP 3'},
+    {'value': '4', 'title': 'STEP 4'},
+    {'value': '5', 'title': 'STEP 5'},
   ];
 
   /**
@@ -59,56 +67,23 @@ class _StockManageState extends State<StockManage> {
           height: 50.0,
           child: SmartSelect<String>.single(
               title: "${step}차",
-              choiceItems: options,
+              modalType: S2ModalType.bottomSheet,
+              tileBuilder: (context, state) {
+                return S2Tile.fromState(
+                  state,
+                  title: Text(
+                    '차수를 선택해주세요',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              },
+              choiceItems: S2Choice.listFrom(
+                  source: options,
+                  value: (index, item) => item['value'],
+                  title: (index, item) => item['title']),
               value: step,
               onChange: (state) => setState(() => step = state.value)),
         )
-      ],
-    );
-  }
-
-  /**
-   * 업체 선택
-   */
-  Widget corCodeSelect(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          "Company Select",
-          style: kLabelStyle,
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(
-          height: 10.0,
-        ),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 50.0,
-          child: FutureBuilder(
-              future: corList,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return SmartSelect<String>.single(
-                      title: corCodeName,
-                      choiceItems: S2Choice.listFrom(
-                        source: snapshot.data,
-                        value: (index, item) => item['value'],
-                        title: (index, item) => item['title'],
-                      ),
-                      onChange: (state) {
-                        setState(() {
-                          corCode = state.value;
-                          corCodeName = state.valueTitle;
-                        });
-                      });
-                } else if (snapshot.hasError) {
-                  return Text("업체가 존재하지 않습니다.");
-                }
-                return CircularProgressIndicator();
-              }),
-        ),
       ],
     );
   }
@@ -139,13 +114,67 @@ class _StockManageState extends State<StockManage> {
             child: Text(
               DateFormat('yyyy-MM-dd').format(currentTime),
               style: TextStyle(
-                  color: Colors.blue,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'OpenSans',
                   fontSize: 16.0),
             ),
           ),
         )
+      ],
+    );
+  }
+
+  /**
+   * 업체 선택
+   */
+  Widget corCodeSelect(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          "Company Select",
+          style: kLabelStyle,
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(
+          height: 10.0,
+        ),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 50.0,
+          child: FutureBuilder(
+              future: corList,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return SmartSelect<String>.single(
+                      title: corCodeName,
+                      modalType: S2ModalType.bottomSheet,
+                      tileBuilder: (context, state) {
+                        return S2Tile.fromState(
+                          state,
+                          title: Text('업체를 선택해주세요.',
+                              style: TextStyle(color: Colors.white)),
+                        );
+                      },
+                      choiceItems: S2Choice.listFrom(
+                        source: snapshot.data,
+                        value: (index, item) => item['value'],
+                        title: (index, item) => item['title'],
+                      ),
+                      onChange: (state) {
+                        setState(() {
+                          corCode = state.value;
+                          corCodeName = state.valueTitle;
+                        });
+                      });
+                } else if (snapshot.hasError) {
+                  return Text("업체가 존재하지 않습니다.");
+                }
+                return CircularProgressIndicator();
+              }),
+        ),
       ],
     );
   }
@@ -174,7 +203,7 @@ class _StockManageState extends State<StockManage> {
       body: GestureDetector(
         child: Stack(
           children: <Widget>[
-            backWallpaper(),
+            // backWallpaper(),
             Container(
               height: double.infinity,
               child: SingleChildScrollView(
@@ -183,11 +212,12 @@ class _StockManageState extends State<StockManage> {
                     EdgeInsets.symmetric(horizontal: 40.0, vertical: 120.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Text(
                       "PICKING LIST",
                       style: TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFF527DAA),
                           fontFamily: 'OpenSans',
                           fontSize: 40.0,
                           fontWeight: FontWeight.bold),
@@ -212,8 +242,8 @@ class _StockManageState extends State<StockManage> {
                           EdgeInsets.symmetric(vertical: 0, horizontal: 50.0),
                       child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                              primary: Colors.white,
-                              onPrimary: Colors.blue,
+                              primary: Color(0xFF527DAA),
+                              onPrimary: Colors.white,
                               elevation: 5),
                           onPressed: () {
                             pickVO pi = pickVO();
@@ -249,20 +279,3 @@ class _StockManageState extends State<StockManage> {
     ));
   }
 }
-
-final kHintTextStyle = TextStyle(
-  color: Colors.white54,
-  fontFamily: 'OpenSans',
-);
-
-final kLabelStyle = TextStyle(
-  color: Colors.white,
-  fontWeight: FontWeight.bold,
-  fontSize: 14.0,
-  fontFamily: 'OpenSans',
-);
-
-final kBoxDecorationStyle = BoxDecoration(
-  color: Colors.white,
-  borderRadius: BorderRadius.circular(10.0),
-);

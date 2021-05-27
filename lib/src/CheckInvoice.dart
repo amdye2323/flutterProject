@@ -172,7 +172,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
           body: Builder(builder: (BuildContext context) {
             return Stack(
               children: [
-                backWallpaper(),
+                // backWallpaper(),
                 Container(
                   alignment: Alignment.center,
                   height: double.infinity,
@@ -186,12 +186,13 @@ class _CheckInvoiceState extends State<CheckInvoice> {
                       _checkBarcodeList.length == 0
                           ? ElevatedButton(
                               style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(Colors.white)),
+                                  backgroundColor: MaterialStateProperty.all(
+                                Color(0xFF527DAA),
+                              )),
                               onPressed: () => startBarcodeScanStream(),
                               child: Text(
                                 '송장번호 체크',
-                                style: TextStyle(color: Colors.blue),
+                                style: TextStyle(color: Colors.white),
                               ))
                           : TextButton(
                               onPressed: () {
@@ -201,7 +202,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
                                 "송장번호 리스트",
                                 style: TextStyle(
                                   fontSize: 20.0,
-                                  color: Colors.white,
+                                  color: Color(0xFF6CA8F1),
                                 ),
                               )),
                       Expanded(
@@ -235,22 +236,23 @@ class _CheckInvoiceState extends State<CheckInvoice> {
             );
           }),
           floatingActionButton: SpeedDial(
+            backgroundColor: Color(0xFF527DAA),
             icon: CupertinoIcons.circle_grid_3x3,
             children: [
               SpeedDialChild(
-                  labelBackgroundColor: Colors.blue,
+                  backgroundColor: Color(0xFF527DAA),
                   onTap: () {
                     startBarcodeScanStream();
                   },
                   child: Icon(CupertinoIcons.camera)),
               SpeedDialChild(
-                  labelBackgroundColor: Colors.blue,
+                  backgroundColor: Color(0xFF527DAA),
                   onTap: () {
                     FlutterDialog(context);
                   },
                   child: Icon(CupertinoIcons.search)),
               SpeedDialChild(
-                  labelBackgroundColor: Colors.blue,
+                  backgroundColor: Color(0xFF527DAA),
                   onTap: () {
                     reset();
                   },

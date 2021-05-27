@@ -113,9 +113,27 @@ Widget backWallpaper() {
           Color(0xFF61A4F1),
           Color(0xFF478DE0),
           Color(0xFF398AE5),
+          // #1d64a0
         ],
         stops: [0.1, 0.4, 0.7, 0.9],
       ),
     ),
   );
 }
+
+final kHintTextStyle = TextStyle(
+  color: Color(0xFF527DAA),
+  fontFamily: 'OpenSans',
+);
+
+final kLabelStyle = TextStyle(
+  color: Color(0xFF527DAA),
+  fontWeight: FontWeight.bold,
+  fontSize: 14.0,
+  fontFamily: 'OpenSans',
+);
+
+final kBoxDecorationStyle = BoxDecoration(
+  color: Color(0xFF527DAA),
+  borderRadius: BorderRadius.circular(10.0),
+);

@@ -25,6 +25,7 @@ class _StockMoveState extends State<StockMove> {
   String _scanBarcode = "default";
   String _zoneBarcode = "default";
   String _firstRadio = "지정구역";
+  String _bottomMent = "스캔 버튼을 눌러주세요";
   String _bb = "";
   bool barcodeStatus = false;
   final _viewModel = HomeViewModel();
@@ -65,6 +66,7 @@ class _StockMoveState extends State<StockMove> {
       skuDetail = _viewModel.skuDetail(_scanBarcode);
       result = _viewModel.stockMoveToZone(_scanBarcode, _zoneBarcode, userId);
       _firstRadio = "지정구역";
+      _bottomMent = "스캔 버튼을 눌러주세요";
     });
   }
 
@@ -82,6 +84,17 @@ class _StockMoveState extends State<StockMove> {
   void onActionSelected(String key) {
     setState(() {
       _firstRadio = key;
+      switch (key) {
+        case "지정구역":
+          _bottomMent = "스캔 버튼을 누른 이후 체크해주세요.";
+          return;
+        case "거래선출고":
+          _bottomMent = "거래선 선택 이후 체크해주세요";
+          return;
+        case "피킹구역":
+          _bottomMent = "체크버튼을 눌러주세요.";
+          return;
+      }
     });
   }
 
@@ -192,24 +205,30 @@ class _StockMoveState extends State<StockMove> {
       body: Builder(builder: (BuildContext context) {
         return Stack(
           children: <Widget>[
-            backWallpaper(),
+            // backWallpaper(),
             Container(
-                padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+                padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
                 height: double.infinity,
                 alignment: Alignment.center,
                 child: SingleChildScrollView(
                   child: Flex(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       direction: Axis.vertical,
                       children: <Widget>[
                         FutureBuilder<List<skuInfo>>(
                           future: skuDetail,
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
-                              return Text(
-                                "스캔 버튼을 눌러주세요",
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white),
+                              return TextButton(
+                                child: Text(
+                                  "Please Your Material Barcode",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: Color(0xFF527DAA),
+                                      decoration: TextDecoration.underline),
+                                ),
+                                onPressed: scanBarcodeNormal,
                               );
                             } else if (snapshot.hasError) {
                               return Text("에러입니다.");
@@ -222,26 +241,43 @@ class _StockMoveState extends State<StockMove> {
                                     SizedBox(
                                       height: 10.0,
                                     ),
-                                    normalCard("${snapshot.data[0].barcode}",
-                                        CupertinoIcons.barcode),
-                                    normalCard("${snapshot.data[0].skuLabel}",
-                                        CupertinoIcons.cube_box_fill),
-                                    normalCard(
-                                        "입고일 : " + snapshot.data[0].ioDate,
-                                        CupertinoIcons.calendar),
-                                    normalCard("수량 : " + snapshot.data[0].qty,
-                                        CupertinoIcons.number),
-                                    normalCard(
-                                        "${snapshot.data[0].storageZone}",
-                                        CupertinoIcons.eye_fill),
+                                    Container(
+                                        height: 250,
+                                        child: SingleChildScrollView(
+                                          child: Flex(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            direction: Axis.vertical,
+                                            children: [
+                                              normalCard(
+                                                  "${snapshot.data[0].barcode}",
+                                                  CupertinoIcons.barcode),
+                                              normalCard(
+                                                  "${snapshot.data[0].skuLabel}",
+                                                  CupertinoIcons.cube_box_fill),
+                                              normalCard(
+                                                  "입고일 : " +
+                                                      snapshot.data[0].ioDate,
+                                                  CupertinoIcons.calendar),
+                                              normalCard(
+                                                  "수량 : " +
+                                                      snapshot.data[0].qty,
+                                                  CupertinoIcons.number),
+                                              normalCard(
+                                                  "${snapshot.data[0].storageZone}",
+                                                  CupertinoIcons.eye_fill),
+                                            ],
+                                          ),
+                                        )),
                                     Icon(
                                       CupertinoIcons.arrowtriangle_down_fill,
                                       size: 40,
-                                      color: Colors.white,
+                                      color: Color(0xFF527DAA),
                                     ),
                                     // normalTitle("대상 구역"),
                                     CupertinoRadioChoice(
-                                        notSelectedColor: Colors.white70,
+                                        notSelectedColor: Colors.lightGreen,
+                                        selectedColor: Color(0xFF527DAA),
                                         choices: genderMap,
                                         onChange: onActionSelected,
                                         initialKeyValue: _firstRadio),
@@ -253,10 +289,10 @@ class _StockMoveState extends State<StockMove> {
                                         builder: (context, snapshot) {
                                           if (!snapshot.hasData) {
                                             return Text(
-                                              "스캔 버튼을 눌러주세요",
+                                              _bottomMent,
                                               style: TextStyle(
-                                                  fontSize: 30,
-                                                  color: Colors.white),
+                                                  fontSize: 20,
+                                                  color: Color(0xFF527DAA)),
                                             );
                                           } else if (snapshot.hasError) {
                                             return Text("에러입니다.");
@@ -300,7 +336,7 @@ class _StockMoveState extends State<StockMove> {
                 onPressed: scanBarcodeNormal,
                 child: Icon(
                   CupertinoIcons.barcode,
-                  color: Colors.blue,
+                  color: Color(0xFF527DAA),
                 ),
               ),
             ),
@@ -311,7 +347,7 @@ class _StockMoveState extends State<StockMove> {
                 onPressed: pageReset,
                 child: Icon(
                   CupertinoIcons.arrow_up_bin,
-                  color: Colors.blue,
+                  color: Color(0xFF527DAA),
                 ),
               ),
             ),
@@ -322,7 +358,7 @@ class _StockMoveState extends State<StockMove> {
                 onPressed: stockMoveToZone,
                 child: Icon(
                   CupertinoIcons.check_mark,
-                  color: Colors.blue,
+                  color: Color(0xFF527DAA),
                 ),
               ),
             ),
@@ -335,7 +371,7 @@ class _StockMoveState extends State<StockMove> {
 }
 
 final kLabelStyle = TextStyle(
-  color: Colors.blue,
+  color: Colors.white,
   fontWeight: FontWeight.bold,
   fontFamily: 'OpenSans',
 );
@@ -344,11 +380,11 @@ Widget normalCard(String content, IconData ico) {
   return Padding(
     padding: EdgeInsets.all(5.0),
     child: Card(
-      color: Colors.white,
+      color: Color(0xFF527DAA),
       child: ListTile(
         leading: Icon(
           ico,
-          color: Colors.blue,
+          color: Colors.white,
           size: 25,
         ),
         title: Text(
@@ -364,7 +400,7 @@ Widget normalTitle(String content) {
   return Text(
     content,
     style: TextStyle(
-      color: Colors.white,
+      color: Color(0xFF527DAA),
       fontFamily: 'OpenSans',
       fontSize: 30.0,
       fontWeight: FontWeight.bold,

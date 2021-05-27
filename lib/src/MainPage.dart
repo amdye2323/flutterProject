@@ -138,7 +138,6 @@ class FirstWidget extends StatelessWidget {
         child: GestureDetector(
           child: Stack(
             children: <Widget>[
-              backWallpaper(),
               Container(
                 height: double.infinity,
                 child: SingleChildScrollView(
@@ -156,7 +155,7 @@ class FirstWidget extends StatelessWidget {
                             Text(
                               'GOLINK',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Color(0xFF527DAA),
                                 fontFamily: 'OpenSans',
                                 fontSize: 40.0,
                                 fontWeight: FontWeight.bold,
@@ -165,28 +164,8 @@ class FirstWidget extends StatelessWidget {
                             SizedBox(
                               height: 20,
                             ),
-                            Card(
-                                color: Colors.white,
-                                child: ListTile(
-                                    leading: Icon(
-                                      CupertinoIcons.tag,
-                                      color: Color(0xFF527DAA),
-                                    ),
-                                    title: Text(
-                                      "접속자 아이디 : ${user.userId}",
-                                      style: TextStyle(color: Colors.blue),
-                                    ))),
-                            Card(
-                                color: Colors.white,
-                                child: ListTile(
-                                    leading: Icon(
-                                      CupertinoIcons.person_alt,
-                                      color: Color(0xFF527DAA),
-                                    ),
-                                    title: Text(
-                                      "접속자 이름 : ${user.userName}",
-                                      style: TextStyle(color: Colors.blue),
-                                    ))),
+                            listCard(CupertinoIcons.info, user.userId),
+                            listCard(CupertinoIcons.person_alt, user.userName),
                           ]);
                     },
                   ),
@@ -199,3 +178,44 @@ class FirstWidget extends StatelessWidget {
     );
   }
 }
+
+TextStyle mainLabel() {
+  return TextStyle(
+    color: Color(0xFF527DAA),
+    letterSpacing: 1.5,
+    fontSize: 14.0,
+    fontWeight: FontWeight.bold,
+    fontFamily: 'OpenSans',
+  );
+}
+
+Widget listCard(IconData iconData, String content) {
+  return Card(
+      color: Color(0xFF527DAA),
+      child: ListTile(
+          leading: Icon(
+            iconData,
+            color: Colors.white,
+          ),
+          title: Text(
+            "접속자 이름 : ${content}",
+            style: TextStyle(color: Colors.white),
+          )));
+}
+
+final kHintTextStyle = TextStyle(
+  color: Color(0xFF527DAA),
+  fontFamily: 'OpenSans',
+);
+
+final kLabelStyle = TextStyle(
+  color: Color(0xFF527DAA),
+  fontWeight: FontWeight.bold,
+  fontSize: 14.0,
+  fontFamily: 'OpenSans',
+);
+
+final kBoxDecorationStyle = BoxDecoration(
+  color: Color(0xFF527DAA),
+  borderRadius: BorderRadius.circular(10.0),
+);
