@@ -30,14 +30,6 @@ class _StockManageState extends State<StockManage> {
     corList = _corSelFuture(context);
   }
 
-  // List<S2Choice<String>> options = [
-  //   S2Choice<String>(value: "1", title: "STEP 1"),
-  //   S2Choice<String>(value: "2", title: "STEP 2"),
-  //   S2Choice<String>(value: "3", title: "STEP 3"),
-  //   S2Choice<String>(value: "4", title: "STEP 4"),
-  //   S2Choice<String>(value: "5", title: "STEP 5"),
-  // ];
-
   List<Map<String, String>> options = [
     {'value': '1', 'title': 'STEP 1'},
     {'value': '2', 'title': 'STEP 2'},
@@ -154,7 +146,7 @@ class _StockManageState extends State<StockManage> {
                       tileBuilder: (context, state) {
                         return S2Tile.fromState(
                           state,
-                          title: Text('업체를 선택해주세요.',
+                          title: Text(corCodeName,
                               style: TextStyle(color: Colors.white)),
                         );
                       },

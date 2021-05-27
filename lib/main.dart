@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/pick.dart';
@@ -137,3 +138,14 @@ final kBoxDecorationStyle = BoxDecoration(
   color: Color(0xFF527DAA),
   borderRadius: BorderRadius.circular(10.0),
 );
+
+showToastInstance(String msg) {
+  Fluttertoast.showToast(
+      msg: msg,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.yellowAccent,
+      textColor: Colors.black87,
+      fontSize: 16);
+}

@@ -165,4 +165,44 @@ class stockService {
       return "error";
     }
   }
+
+  /**
+   * 거래선 출고
+   */
+  Future<String> stockMoveToCompany(
+      String scanBarcode, String corCode, String userId, String qty) async {
+    String url =
+        "${baseUrl}/api/stockMoveToCompany?scanBarcode=${scanBarcode}&corCode=${corCode}&userId=${userId}&qty=${qty}";
+
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody);
+
+    if (json["result"].toString() == "success") {
+      return json["result"].toString();
+    } else {
+      return "error";
+    }
+  }
+
+  /**
+   * 피킹리스트 이동
+  */
+  Future<String> stockMoveToPickingZone(
+      String scanBarcode, String userId, String qty) async {
+    String url =
+        "${baseUrl}/api/stockMoveToPickingZone?scanBarcode=${scanBarcode}&userId=${userId}&qty=${qty}";
+
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody);
+
+    if (json["result"].toString() == "success") {
+      return json["result"].toString();
+    } else {
+      return "error";
+    }
+  }
 }

@@ -202,20 +202,3 @@ Widget listCard(IconData iconData, String content) {
             style: TextStyle(color: Colors.white),
           )));
 }
-
-final kHintTextStyle = TextStyle(
-  color: Color(0xFF527DAA),
-  fontFamily: 'OpenSans',
-);
-
-final kLabelStyle = TextStyle(
-  color: Color(0xFF527DAA),
-  fontWeight: FontWeight.bold,
-  fontSize: 14.0,
-  fontFamily: 'OpenSans',
-);
-
-final kBoxDecorationStyle = BoxDecoration(
-  color: Color(0xFF527DAA),
-  borderRadius: BorderRadius.circular(10.0),
-);

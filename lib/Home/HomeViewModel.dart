@@ -39,4 +39,14 @@ class HomeViewModel {
       String scanBarcode, String zoneBarcode, String userId) async {
     return await _service.stockMoveToZone(scanBarcode, zoneBarcode, userId);
   }
+
+  Future<String> stockMoveToCompany(
+      String scanBarcode, String corCode, String userId, String qty) async {
+    return await _service.stockMoveToCompany(scanBarcode, corCode, userId, qty);
+  }
+
+  Future<String> stockMoveToPickingZone(
+      String scanBarcode, String userId, String qty) async {
+    return await _service.stockMoveToPickingZone(scanBarcode, userId, qty);
+  }
 }
