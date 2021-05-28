@@ -22,6 +22,10 @@ class stockService {
   Future<List<skuInfo>> requestSkuInfo(String barcode) async {
     String url = "${baseUrl}/api/barcode?barcode=${barcode}";
 
+    if (barcode == "default") {
+      return null;
+    }
+
     var response = await http.get(url, headers: header);
 
     String responsBody = utf8.decode(response.bodyBytes);
@@ -127,6 +131,9 @@ class stockService {
    * 바코드 존 스캔
    */
   Future<BarcodeZone> getBarcodeZone(String barcode) async {
+    if (barcode == "default") {
+      return null;
+    }
     String url = "${baseUrl}/api/barcodeZone?barcode=${barcode}";
 
     var response = await http.get(url, headers: header);
@@ -170,17 +177,17 @@ class stockService {
    * 거래선 출고
    */
   Future<String> stockMoveToCompany(
-      String scanBarcode, String corCode, String userId, String qty) async {
+      String scanBarcode, String userId, String qty) async {
     String url =
-        "${baseUrl}/api/stockMoveToCompany?scanBarcode=${scanBarcode}&corCode=${corCode}&userId=${userId}&qty=${qty}";
+        "${baseUrl}/api/stockMoveToCompany?scanBarcode=${scanBarcode}&userId=${userId}&qty=${qty}";
 
     var response = await http.get(url, headers: header);
 
     String responsBody = utf8.decode(response.bodyBytes);
     var json = jsonDecode(responsBody);
-
+    print(json);
     if (json["result"].toString() == "success") {
-      return json["result"].toString();
+      return "success";
     } else {
       return "error";
     }
@@ -198,11 +205,31 @@ class stockService {
 
     String responsBody = utf8.decode(response.bodyBytes);
     var json = jsonDecode(responsBody);
-
+    print(json);
     if (json["result"].toString() == "success") {
-      return json["result"].toString();
+      return "success";
     } else {
       return "error";
     }
+  }
+
+  Future<List<skuInfo>> barcodeSkuList(String barcode) async {
+    String url = "${baseUrl}/api/barcodeSkuList?barcode=${barcode}";
+
+    if (barcode == "default") {
+      return null;
+    }
+
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody)["list"].cast<Map<String, dynamic>>();
+
+    var list = json.map<skuInfo>((json) => skuInfo.fromJson(json)).toList();
+
+    if (list.length == 0) {
+      return Future.error("error");
+    }
+    return list;
   }
 }

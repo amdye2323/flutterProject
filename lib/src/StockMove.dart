@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_select/smart_select.dart';
 import 'package:testflutter/DTO/BarcodeZone.dart';
 
 import '../DTO/skuInfo.dart';
@@ -24,11 +23,9 @@ class _StockMoveState extends State<StockMove> {
   //재고 바코드
   String _scanBarcode = "default";
   String _zoneBarcode = "default";
-  String _firstRadio = "지정구역";
-  String _bottomMent = "스캔 버튼을 눌러주세요";
+  String _firstRadio = "구역지정";
+  String _bottomMent = "스캔 이후 체크해주세요";
 
-  String corCode = "";
-  String corCodeName = "선택해주세요";
   String qty = "";
   String oriQty = "";
 
@@ -46,7 +43,6 @@ class _StockMoveState extends State<StockMove> {
   Future<List<skuInfo>> skuDetail;
   Future<BarcodeZone> barZone;
   Future<String> result;
-  Future<List<Map<String, String>>> corList;
 
   @override
   void initState() {
@@ -55,7 +51,6 @@ class _StockMoveState extends State<StockMove> {
     String userId = Provider.of<UserModel>(context, listen: false).userId;
     skuDetail = _viewModel.skuDetail(_scanBarcode);
     result = _viewModel.stockMoveToZone(_scanBarcode, _zoneBarcode, userId);
-    corList = _corSelFuture(context);
   }
 
   @override
@@ -72,44 +67,58 @@ class _StockMoveState extends State<StockMove> {
     setState(() {
       skuDetail = _viewModel.skuDetail(_scanBarcode);
       result = _viewModel.stockMoveToZone(_scanBarcode, _zoneBarcode, userId);
-      corList = _corSelFuture(context);
-      _firstRadio = "구역지정";
-      _bottomMent = "스캔 버튼을 눌러주세요";
+      barZone = _viewModel.getBarcodeZone(_zoneBarcode);
     });
-  }
-
-  Future<List<Map<String, String>>> _corSelFuture(BuildContext context) async {
-    return await _viewModel.getCorCode();
   }
 
   Future<void> stockMoveToZone(String dataQty) async {
     String userId = Provider.of<UserModel>(context, listen: false).userId;
-    Future<String> result;
+    String httpResult = "";
     switch (_firstRadio) {
       case "구역지정":
+        httpResult = await _viewModel.stockMoveToZone(
+            _scanBarcode, _zoneBarcode, userId);
+        if (httpResult == "success") {
+          showToastInstance("성공적으로 등록되었습니다.");
+          setState(() {
+            skuDetail = _viewModel.skuDetail(_scanBarcode);
+          });
+        } else {
+          showToastInstance("정보를 다시 한번 확인해주세요");
+        }
         return;
       case "거래선출고":
-        result = _viewModel.stockMoveToCompany(
-            _scanBarcode, corCode, userId, dataQty);
+        httpResult =
+            await _viewModel.stockMoveToCompany(_scanBarcode, userId, dataQty);
+        if (httpResult == "success") {
+          showToastInstance("성공적으로 등록되었습니다.");
+        } else {
+          showToastInstance("정보를 다시 한번 확인해주세요");
+        }
+        setState(() {
+          skuDetail = _viewModel.skuDetail(_scanBarcode);
+        });
         return;
       case "피킹구역":
-        result =
-            _viewModel.stockMoveToPickingZone(_scanBarcode, userId, dataQty);
+        httpResult = await _viewModel.stockMoveToPickingZone(
+            _scanBarcode, userId, dataQty);
+        if (httpResult == "success") {
+          showToastInstance("성공적으로 등록되었습니다.");
+        } else {
+          showToastInstance("정보를 다시 한번 확인해주세요");
+        }
+        setState(() {
+          skuDetail = _viewModel.skuDetail(_scanBarcode);
+        });
         return;
     }
-    if (result == "success") {
-      showToastInstance("성공적으로 등록되었습니다.");
-    } else {
-      showToastInstance("정보를 다시 한번 확인해주세요");
-    }
-    pageReset();
   }
 
   void onActionSelected(String key) {
     setState(() {
       _firstRadio = key;
       switch (key) {
-        case "지정구역":
+        case "구역지정":
           _bottomMent = "스캔 버튼을 누른 이후 체크해주세요.";
           return;
         case "거래선출고":
@@ -120,60 +129,6 @@ class _StockMoveState extends State<StockMove> {
           return;
       }
     });
-  }
-
-  /**
-   * 업체 선택
-   */
-  Widget corCodeSelect(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          "Company Select",
-          style: kLabelStyle,
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(
-          height: 10.0,
-        ),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 50.0,
-          child: FutureBuilder(
-              future: corList,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return SmartSelect<String>.single(
-                      title: corCodeName,
-                      modalType: S2ModalType.bottomSheet,
-                      tileBuilder: (context, state) {
-                        return S2Tile.fromState(
-                          state,
-                          title: Text(corCodeName,
-                              style: TextStyle(color: Colors.white)),
-                        );
-                      },
-                      choiceItems: S2Choice.listFrom(
-                        source: snapshot.data,
-                        value: (index, item) => item['value'],
-                        title: (index, item) => item['title'],
-                      ),
-                      onChange: (state) {
-                        setState(() {
-                          corCode = state.value;
-                          corCodeName = state.valueTitle;
-                        });
-                      });
-                } else if (snapshot.hasError) {
-                  return Text("업체가 존재하지 않습니다.");
-                }
-                return CircularProgressIndicator();
-              }),
-        ),
-      ],
-    );
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -188,30 +143,41 @@ class _StockMoveState extends State<StockMove> {
     }
 
     if (barcodeScanRes.length == 16) {
-      if (barcodeStatus == false) {
-        setState(() {
-          _scanBarcode = barcodeScanRes;
-          skuDetail = _viewModel.skuDetail(_scanBarcode);
-          barcodeStatus = true;
-        });
-      } else {
-        showToastInstance("대상지역을 스캔해주세요.");
-      }
+      setState(() {
+        _scanBarcode = barcodeScanRes;
+        skuDetail = _viewModel.skuDetail(_scanBarcode);
+      });
     } else if (barcodeScanRes.length == 10) {
-      if (barcodeStatus == true) {
-        setState(() {
-          _zoneBarcode = barcodeScanRes;
-          barZone = _viewModel.getBarcodeZone(_zoneBarcode);
-        });
-      } else {
-        showToastInstance("대상 지역이 아닙니다.");
-      }
+      setState(() {
+        _zoneBarcode = barcodeScanRes;
+        barZone = _viewModel.getBarcodeZone(_zoneBarcode);
+      });
     } else {
       showToastInstance("바코드를 확안해주세요.");
     }
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
+
+    // if (barcodeScanRes.length == 16) {
+    //   if (barcodeStatus == false) {
+    //     setState(() {
+    //       _scanBarcode = barcodeScanRes;
+    //       skuDetail = _viewModel.skuDetail(_scanBarcode);
+    //       barcodeStatus = true;
+    //     });
+    //   } else {
+    //     showToastInstance("대상지역을 스캔해주세요.");
+    //   }
+    // } else if (barcodeScanRes.length == 10) {
+    //   if (barcodeStatus == true) {
+    //     setState(() {
+    //       _zoneBarcode = barcodeScanRes;
+    //       barZone = _viewModel.getBarcodeZone(_zoneBarcode);
+    //     });
+    //   } else {
+    //     showToastInstance("대상 지역이 아닙니다.");
+    //   }
+    // } else {
+    //   showToastInstance("바코드를 확안해주세요.");
+    // }
     if (!mounted) return;
 
     // setState(() {
@@ -235,14 +201,17 @@ class _StockMoveState extends State<StockMove> {
             title: Text(
               "숫자를 입력해주세요",
               style: TextStyle(
-                  decoration: TextDecoration.underline, color: Colors.blue),
+                  decoration: TextDecoration.underline,
+                  color: Color(0xFF527DAA)),
             ),
             content: Container(
-              height: 150,
+              height: 100,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("전체 수량 : ${oriQty}"),
+                  Text(
+                    "전체 수량 : ${oriQty}",
+                  ),
                   SizedBox(
                     height: 20.0,
                   ),
@@ -269,7 +238,7 @@ class _StockMoveState extends State<StockMove> {
   }
 
   Widget bottomNavi() {
-    if (_firstRadio == "지정구역") {
+    if (_firstRadio == "구역지정") {
       return FutureBuilder<BarcodeZone>(
           future: barZone,
           builder: (context, snapshot) {
@@ -294,8 +263,20 @@ class _StockMoveState extends State<StockMove> {
                           CupertinoIcons.eye_fill),
                       normalCard("장소상태 : ${snapshot.data.statusZone}",
                           CupertinoIcons.tag_fill),
+                      ElevatedButton(
+                          onPressed: () {
+                            stockMoveToZone(oriQty);
+                          },
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                            Color(0xFF527DAA),
+                          )),
+                          child: Text(
+                            "등록하기",
+                            style: TextStyle(fontSize: 20.0),
+                          )),
                       SizedBox(
-                        height: 20.0,
+                        height: 40.0,
                       ),
                     ],
                   ),
@@ -305,10 +286,26 @@ class _StockMoveState extends State<StockMove> {
               return CircularProgressIndicator();
             }
           });
-    } else if (_firstRadio == "거래선출고") {
-      return corCodeSelect(context);
     } else {
-      return corCodeSelect(context);
+      return Column(
+        children: [
+          SizedBox(
+            height: 20.0,
+          ),
+          ElevatedButton(
+              onPressed: () {
+                qtyDialog(context, oriQty);
+              },
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                Color(0xFF527DAA),
+              )),
+              child: Text(
+                "등록하기",
+                style: TextStyle(fontSize: 20.0),
+              )),
+        ],
+      );
     }
   }
 
@@ -322,7 +319,7 @@ class _StockMoveState extends State<StockMove> {
             Container(
                 padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
                 height: double.infinity,
-                alignment: Alignment.topCenter,
+                alignment: Alignment.center,
                 child: SingleChildScrollView(
                   child: Flex(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,6 +348,9 @@ class _StockMoveState extends State<StockMove> {
                                 padding: EdgeInsets.all(30.0),
                                 child: Column(
                                   children: [
+                                    SizedBox(
+                                      height: 20.0,
+                                    ),
                                     normalTitle("스캔 재고"),
                                     SizedBox(
                                       height: 10.0,
@@ -395,8 +395,8 @@ class _StockMoveState extends State<StockMove> {
                                         children: [
                                           CupertinoRadioChoice(
                                               notSelectedColor:
-                                                  Colors.lightGreen,
-                                              selectedColor: Color(0xFF527DAA),
+                                                  Color(0xFF527DAA),
+                                              selectedColor: Colors.lightGreen,
                                               choices: genderMap,
                                               onChange: onActionSelected,
                                               initialKeyValue: _firstRadio),
@@ -407,6 +407,9 @@ class _StockMoveState extends State<StockMove> {
                                       height: 10.0,
                                     ),
                                     bottomNavi(),
+                                    SizedBox(
+                                      height: 40.0,
+                                    ),
                                   ],
                                 ),
                               );
@@ -434,7 +437,7 @@ class _StockMoveState extends State<StockMove> {
                 backgroundColor: Colors.white,
                 onPressed: pageReset,
                 child: Icon(
-                  CupertinoIcons.arrow_up_bin,
+                  CupertinoIcons.arrow_uturn_left,
                   color: Color(0xFF527DAA),
                 ),
               ),
@@ -444,7 +447,7 @@ class _StockMoveState extends State<StockMove> {
               child: FloatingActionButton(
                 backgroundColor: Colors.white,
                 onPressed: () {
-                  if (_firstRadio == "지정구역") {
+                  if (_firstRadio == "구역지정") {
                     stockMoveToZone(oriQty);
                   } else {
                     qtyDialog(context, oriQty);
@@ -465,7 +468,7 @@ class _StockMoveState extends State<StockMove> {
 }
 
 final kLabelStyle = TextStyle(
-  color: Colors.white,
+  color: Color(0xFF527DAA),
   fontWeight: FontWeight.bold,
   fontFamily: 'OpenSans',
 );
@@ -474,11 +477,12 @@ Widget normalCard(String content, IconData ico) {
   return Padding(
     padding: EdgeInsets.all(5.0),
     child: Card(
-      color: Color(0xFF527DAA),
+      // color: Color(0xFF527DAA),
+      color: Colors.white,
       child: ListTile(
         leading: Icon(
           ico,
-          color: Colors.white,
+          color: Color(0xFF527DAA),
           size: 25,
         ),
         title: Text(

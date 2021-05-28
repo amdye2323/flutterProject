@@ -65,7 +65,7 @@ class _StockManageState extends State<StockManage> {
                   state,
                   title: Text(
                     '차수를 선택해주세요',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Color(0xFF527DAA)),
                   ),
                 );
               },
@@ -98,7 +98,6 @@ class _StockManageState extends State<StockManage> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
-          height: 60.0,
           child: TextButton(
             onPressed: () {
               _selecetDate(context);
@@ -106,7 +105,7 @@ class _StockManageState extends State<StockManage> {
             child: Text(
               DateFormat('yyyy-MM-dd').format(currentTime),
               style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF527DAA),
                   fontWeight: FontWeight.bold,
                   fontFamily: 'OpenSans',
                   fontSize: 16.0),
@@ -135,7 +134,6 @@ class _StockManageState extends State<StockManage> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
-          height: 50.0,
           child: FutureBuilder(
               future: corList,
               builder: (context, snapshot) {
@@ -147,7 +145,7 @@ class _StockManageState extends State<StockManage> {
                         return S2Tile.fromState(
                           state,
                           title: Text(corCodeName,
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: Color(0xFF527DAA))),
                         );
                       },
                       choiceItems: S2Choice.listFrom(
@@ -198,6 +196,7 @@ class _StockManageState extends State<StockManage> {
             // backWallpaper(),
             Container(
               height: double.infinity,
+              alignment: Alignment.topCenter,
               child: SingleChildScrollView(
                 physics: AlwaysScrollableScrollPhysics(),
                 padding:

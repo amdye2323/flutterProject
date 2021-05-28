@@ -41,12 +41,16 @@ class HomeViewModel {
   }
 
   Future<String> stockMoveToCompany(
-      String scanBarcode, String corCode, String userId, String qty) async {
-    return await _service.stockMoveToCompany(scanBarcode, corCode, userId, qty);
+      String scanBarcode, String userId, String qty) async {
+    return await _service.stockMoveToCompany(scanBarcode, userId, qty);
   }
 
   Future<String> stockMoveToPickingZone(
       String scanBarcode, String userId, String qty) async {
     return await _service.stockMoveToPickingZone(scanBarcode, userId, qty);
+  }
+
+  Future<List<skuInfo>> barcodeSkuList(String barcode) async {
+    return await _service.barcodeSkuList(barcode);
   }
 }

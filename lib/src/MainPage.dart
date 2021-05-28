@@ -7,6 +7,7 @@ import 'package:testflutter/src/CheckInvoice.dart';
 import 'package:testflutter/src/LoginScreen.dart';
 import 'package:testflutter/src/StockManage.dart';
 import 'package:testflutter/src/StockMove.dart';
+import 'package:testflutter/src/ZoneMove.dart';
 
 import '../main.dart';
 
@@ -35,6 +36,7 @@ class _MainFulPageState extends State<MainFulPage> {
     FirstWidget(),
     StockManage(),
     StockMove(),
+    ZoneMove(),
     CheckInvoice(),
   ];
   void _onItemTapped(int index) {
@@ -82,7 +84,7 @@ class _MainFulPageState extends State<MainFulPage> {
                     child: IconButton(
                       icon: const Icon(CupertinoIcons.clear),
                       onPressed: () {
-                        var delRE = deleteSecureDate('login');
+                        deleteSecureDate('login');
                         Provider.of<UserModel>(context, listen: false)
                             .popUser();
                         Navigator.push(
@@ -112,11 +114,16 @@ class _MainFulPageState extends State<MainFulPage> {
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(CupertinoIcons.barcode_viewfinder),
-                    label: '재고조회',
+                    label: '재고스캔',
                     backgroundColor: Colors.black,
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.settings),
+                    icon: Icon(CupertinoIcons.arrow_up_arrow_down_circle_fill),
+                    label: '구역스캔',
+                    backgroundColor: Colors.black,
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(CupertinoIcons.doc_person_fill),
                     label: '송장체크',
                     backgroundColor: Colors.black,
                   ),
