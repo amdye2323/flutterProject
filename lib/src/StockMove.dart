@@ -29,6 +29,7 @@ class _StockMoveState extends State<StockMove> {
 
   String qty = "";
   String oriQty = "";
+  String skuCode = "";
 
   bool barcodeStatus = false;
   final _viewModel = HomeViewModel();
@@ -70,6 +71,11 @@ class _StockMoveState extends State<StockMove> {
 
   Future<void> stockMoveToZone(String dataQty) async {
     String userId = Provider.of<UserModel>(context, listen: false).userId;
+    if (userId == "") {
+      showToastInstance("로그인 아이디를 확인해주세요");
+      Navigator.popAndPushNamed(context, '/');
+      return;
+    }
     String httpResult = "";
     switch (_firstRadio) {
       case "구역지정":
@@ -110,7 +116,7 @@ class _StockMoveState extends State<StockMove> {
         return;
       case "분할등록":
         httpResult = await _viewModel.stockMoveDivision(
-            _scanBarcode, userId, dataQty, oriQty);
+            _scanBarcode, _zoneBarcode, userId, dataQty, oriQty, skuCode);
         if (httpResult == "success") {
           showToastInstance("성공적으로 등록되었습니다.");
         } else {
@@ -247,7 +253,7 @@ class _StockMoveState extends State<StockMove> {
   }
 
   Widget bottomNavi() {
-    if (_firstRadio == "구역지정") {
+    if (_firstRadio == "구역지정" || _firstRadio == "분할등록") {
       return FutureBuilder<BarcodeZone>(
           future: barZone,
           builder: (context, snapshot) {
@@ -348,6 +354,7 @@ class _StockMoveState extends State<StockMove> {
                               return Text("에러입니다.");
                             } else if (snapshot.hasData) {
                               oriQty = snapshot.data[0].qty;
+                              skuCode = snapshot.data[0].sku;
                               return Container(
                                   height: 250,
                                   child: SingleChildScrollView(

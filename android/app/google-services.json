@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:300570268131:android:d2acee6d0ba56e1a0110d6",
         "android_client_info": {
-          "package_name": "com.example.testflutter"
+          "package_name": "fms.returnbox.barcode"
         }
       },
       "oauth_client": [

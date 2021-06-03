@@ -334,15 +334,16 @@ class _ZoneMoveState extends State<ZoneMove> {
                       } else if (snapshot.hasError) {
                         return Text("에러입니다.");
                       } else if (snapshot.hasData) {
-                        return Column(
-                          children: [
-                            Text(
-                              "${snapshot.data[0].storageZone}",
-                              style: kLabelStyle,
-                            ),
-                            Container(
-                              height: 250,
-                              child: SingleChildScrollView(
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Column(
+                            children: [
+                              Text(
+                                "${snapshot.data[0].storageZone}",
+                                style: kLabelStyle,
+                              ),
+                              Container(
+                                height: 250,
                                 child: ListView.builder(
                                     shrinkWrap: true,
                                     itemCount: snapshot.data.length,
@@ -364,7 +365,7 @@ class _ZoneMoveState extends State<ZoneMove> {
                                                 selectTapBarcode =
                                                     "${snapshot.data[index].barcode}";
                                                 oriQty =
-                                                    "${snapshot.data[index].qty}";
+                                                    " 개수 : ${snapshot.data[index].qty} ";
                                               });
                                             },
                                             leading: Icon(
@@ -385,8 +386,8 @@ class _ZoneMoveState extends State<ZoneMove> {
                                       );
                                     }),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         );
                       } else {
                         return CircularProgressIndicator();

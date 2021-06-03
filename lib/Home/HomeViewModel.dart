@@ -52,9 +52,10 @@ class HomeViewModel {
         scanBarcode, userId, qty, oriQty);
   }
 
-  Future<String> stockMoveDivision(
-      String scanBarcode, String userId, String qty, String oriQty) async {
-    return await _service.stockMoveDivision(scanBarcode, userId, qty, oriQty);
+  Future<String> stockMoveDivision(String scanBarcode, String zoneBarcode,
+      String userId, String qty, String oriQty, String sku) async {
+    return await _service.stockMoveDivision(
+        scanBarcode, zoneBarcode, userId, qty, oriQty, sku);
   }
 
   Future<List<skuInfo>> barcodeSkuList(String barcode) async {

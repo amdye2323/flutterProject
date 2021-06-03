@@ -227,13 +227,13 @@ class stockService {
   /**
    * 분할등록
    */
-  Future<String> stockMoveDivision(
-      String scanBarcode, String userId, String qty, String oriQty) async {
+  Future<String> stockMoveDivision(String scanBarcode, String zoneBarcode,
+      String userId, String qty, String oriQty, String sku) async {
     if (int.parse(oriQty) - int.parse(qty) < 0) {
       return "error";
     }
     String url =
-        "${baseUrl}/api/stockMoveDivision?scanBarcode=${scanBarcode}&userId=${userId}&qty=${qty}";
+        "${baseUrl}/api/stockMoveDivision?scanBarcode=${scanBarcode}&zoneBarcode=${zoneBarcode}&userId=${userId}&oriQty=${oriQty}&qty=${qty}&sku=${sku}";
 
     var response = await http.get(url, headers: header);
 
@@ -280,12 +280,12 @@ class stockService {
     var list =
         json.map<skuZoneList>((json) => skuZoneList.fromJson(json)).toList();
 
-    // if (json["result"] == "nothing") {
-    //   return Future.error("error");
-    // }
-    // if (list.length == 0) {
-    //   return Future.error("error");
-    // }
+    if (json["result"] == "nothing") {
+      return Future.error("error");
+    }
+    if (list.length == 0) {
+      return Future.error("error");
+    }
     return list;
   }
 }
