@@ -248,6 +248,7 @@ class _StockManageState extends State<StockManage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => pickListView()));
+                            // Navigator.popAndPushNamed(context, "pickListView");
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

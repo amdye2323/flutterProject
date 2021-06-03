@@ -32,6 +32,8 @@ class MainFulPage extends StatefulWidget {
 class _MainFulPageState extends State<MainFulPage> {
   int screenIndex = 0;
   static final storage = FlutterSecureStorage();
+  final qtyController = TextEditingController();
+
   static List<Widget> _widgetOptions = [
     FirstWidget(),
     StockManage(),
@@ -209,3 +211,42 @@ Widget listCard(IconData iconData, String content) {
             style: TextStyle(color: Colors.white),
           )));
 }
+
+Widget normalCard(String content, IconData ico) {
+  return Padding(
+    padding: EdgeInsets.all(5.0),
+    child: Card(
+      // color: Color(0xFF527DAA),
+      color: Colors.white,
+      child: ListTile(
+        leading: Icon(
+          ico,
+          color: Color(0xFF527DAA),
+          size: 25,
+        ),
+        title: Text(
+          content,
+          style: kLabelStyle,
+        ),
+      ),
+    ),
+  );
+}
+
+Widget normalTitle(String content) {
+  return Text(
+    content,
+    style: TextStyle(
+      color: Color(0xFF527DAA),
+      fontFamily: 'OpenSans',
+      fontSize: 30.0,
+      fontWeight: FontWeight.bold,
+    ),
+  );
+}
+
+final kLabelStyle = TextStyle(
+  color: Color(0xFF527DAA),
+  fontWeight: FontWeight.bold,
+  fontFamily: 'OpenSans',
+);

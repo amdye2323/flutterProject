@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
       user.password = userInfo.split(" ")[3];
       user.name = userInfo.split(" ")[5];
       Provider.of<UserModel>(context, listen: false).setUser(user);
-      Navigator.pushNamed(context, 'MainPage');
+      Navigator.popAndPushNamed(context, 'MainPage');
     }
   }
 

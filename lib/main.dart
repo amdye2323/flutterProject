@@ -5,19 +5,20 @@ import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/pick.dart';
 import 'package:testflutter/src/LoginScreen.dart';
 import 'package:testflutter/src/MainPage.dart';
+import 'package:testflutter/src/pickListView.dart';
 
-void main() => runApp(MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => UserModel("", "", ""),
-        ),
-        ChangeNotifierProvider(
-            create: (context) => pickRequirement("", "", "")),
-      ],
-      child: MaterialApp(
-        home: MyApp(),
+void main() => runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => UserModel("", "", ""),
+          ),
+          ChangeNotifierProvider(
+              create: (context) => pickRequirement("", "", "")),
+        ],
+        child: MyApp(),
       ),
-    ));
+    );
 
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         "MainPage": (context) => MainPage(),
+        "pickListView": (context) => pickListView()
       },
     );
   }

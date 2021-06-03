@@ -11,6 +11,7 @@ import 'package:testflutter/DTO/BarcodeZone.dart';
 import '../DTO/skuInfo.dart';
 import '../Home/HomeViewModel.dart';
 import '../main.dart';
+import 'MainPage.dart';
 
 class StockMove extends StatefulWidget {
   const StockMove({Key key}) : super(key: key);
@@ -37,6 +38,7 @@ class _StockMoveState extends State<StockMove> {
     '구역지정': '구역지정',
     '거래선출고': '거래선출고',
     '피킹구역': '피킹구역',
+    '분할등록': '분할등록',
   };
 
   int count = 0;
@@ -51,12 +53,7 @@ class _StockMoveState extends State<StockMove> {
     String userId = Provider.of<UserModel>(context, listen: false).userId;
     skuDetail = _viewModel.skuDetail(_scanBarcode);
     result = _viewModel.stockMoveToZone(_scanBarcode, _zoneBarcode, userId);
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
+    barZone = _viewModel.getBarcodeZone(_zoneBarcode);
   }
 
   void pageReset() {
@@ -88,8 +85,8 @@ class _StockMoveState extends State<StockMove> {
         }
         return;
       case "거래선출고":
-        httpResult =
-            await _viewModel.stockMoveToCompany(_scanBarcode, userId, dataQty);
+        httpResult = await _viewModel.stockMoveToCompany(
+            _scanBarcode, userId, dataQty, oriQty);
         if (httpResult == "success") {
           showToastInstance("성공적으로 등록되었습니다.");
         } else {
@@ -101,7 +98,19 @@ class _StockMoveState extends State<StockMove> {
         return;
       case "피킹구역":
         httpResult = await _viewModel.stockMoveToPickingZone(
-            _scanBarcode, userId, dataQty);
+            _scanBarcode, userId, dataQty, oriQty);
+        if (httpResult == "success") {
+          showToastInstance("성공적으로 등록되었습니다.");
+        } else {
+          showToastInstance("정보를 다시 한번 확인해주세요");
+        }
+        setState(() {
+          skuDetail = _viewModel.skuDetail(_scanBarcode);
+        });
+        return;
+      case "분할등록":
+        httpResult = await _viewModel.stockMoveDivision(
+            _scanBarcode, userId, dataQty, oriQty);
         if (httpResult == "success") {
           showToastInstance("성공적으로 등록되었습니다.");
         } else {
@@ -142,7 +151,7 @@ class _StockMoveState extends State<StockMove> {
       barcodeScanRes = 'Failed to get platform version.';
     }
 
-    if (barcodeScanRes.length == 16) {
+    if (barcodeScanRes.length == 23) {
       setState(() {
         _scanBarcode = barcodeScanRes;
         skuDetail = _viewModel.skuDetail(_scanBarcode);
@@ -263,18 +272,6 @@ class _StockMoveState extends State<StockMove> {
                           CupertinoIcons.eye_fill),
                       normalCard("장소상태 : ${snapshot.data.statusZone}",
                           CupertinoIcons.tag_fill),
-                      ElevatedButton(
-                          onPressed: () {
-                            stockMoveToZone(oriQty);
-                          },
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                            Color(0xFF527DAA),
-                          )),
-                          child: Text(
-                            "등록하기",
-                            style: TextStyle(fontSize: 20.0),
-                          )),
                       SizedBox(
                         height: 40.0,
                       ),
@@ -319,13 +316,20 @@ class _StockMoveState extends State<StockMove> {
             Container(
                 padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
                 height: double.infinity,
-                alignment: Alignment.center,
+                alignment: Alignment.topCenter,
                 child: SingleChildScrollView(
                   child: Flex(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       direction: Axis.vertical,
                       children: <Widget>[
+                        SizedBox(
+                          height: 30.0,
+                        ),
+                        normalTitle("스캔 재고"),
+                        SizedBox(
+                          height: 10.0,
+                        ),
                         FutureBuilder<List<skuInfo>>(
                           future: skuDetail,
                           builder: (context, snapshot) {
@@ -345,78 +349,62 @@ class _StockMoveState extends State<StockMove> {
                             } else if (snapshot.hasData) {
                               oriQty = snapshot.data[0].qty;
                               return Container(
-                                padding: EdgeInsets.all(30.0),
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      height: 20.0,
+                                  height: 250,
+                                  child: SingleChildScrollView(
+                                    child: Flex(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      direction: Axis.vertical,
+                                      children: [
+                                        normalCard(
+                                            "${snapshot.data[0].barcode}",
+                                            CupertinoIcons.barcode),
+                                        normalCard(
+                                            "${snapshot.data[0].skuLabel}",
+                                            CupertinoIcons.cube_box_fill),
+                                        normalCard(
+                                            "입고일 : " + snapshot.data[0].ioDate,
+                                            CupertinoIcons.calendar),
+                                        normalCard(
+                                            "재고 수량 : ${snapshot.data[0].qty}",
+                                            CupertinoIcons.number),
+                                        normalCard(
+                                            "보관 장소 : ${snapshot.data[0].storageZone}",
+                                            CupertinoIcons.eye_fill),
+                                      ],
                                     ),
-                                    normalTitle("스캔 재고"),
-                                    SizedBox(
-                                      height: 10.0,
-                                    ),
-                                    Container(
-                                        height: 250,
-                                        child: SingleChildScrollView(
-                                          child: Flex(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            direction: Axis.vertical,
-                                            children: [
-                                              normalCard(
-                                                  "${snapshot.data[0].barcode}",
-                                                  CupertinoIcons.barcode),
-                                              normalCard(
-                                                  "${snapshot.data[0].skuLabel}",
-                                                  CupertinoIcons.cube_box_fill),
-                                              normalCard(
-                                                  "입고일 : " +
-                                                      snapshot.data[0].ioDate,
-                                                  CupertinoIcons.calendar),
-                                              normalCard(
-                                                  "재고 수량 : ${snapshot.data[0].qty}",
-                                                  CupertinoIcons.number),
-                                              normalCard(
-                                                  "보관 장소 : ${snapshot.data[0].storageZone}",
-                                                  CupertinoIcons.eye_fill),
-                                            ],
-                                          ),
-                                        )),
-                                    Icon(
-                                      CupertinoIcons.arrowtriangle_down_fill,
-                                      size: 40,
-                                      color: Color(0xFF527DAA),
-                                    ),
-                                    // normalTitle("대상 구역"),
-                                    SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Flex(
-                                        direction: Axis.horizontal,
-                                        children: [
-                                          CupertinoRadioChoice(
-                                              notSelectedColor:
-                                                  Color(0xFF527DAA),
-                                              selectedColor: Colors.lightGreen,
-                                              choices: genderMap,
-                                              onChange: onActionSelected,
-                                              initialKeyValue: _firstRadio),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 10.0,
-                                    ),
-                                    bottomNavi(),
-                                    SizedBox(
-                                      height: 40.0,
-                                    ),
-                                  ],
-                                ),
-                              );
+                                  ));
                             } else {
                               return CircularProgressIndicator();
                             }
                           },
+                        ),
+                        Icon(
+                          CupertinoIcons.arrowtriangle_down_fill,
+                          size: 40,
+                          color: Color(0xFF527DAA),
+                        ),
+                        // normalTitle("대상 구역"),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Flex(
+                            direction: Axis.horizontal,
+                            children: [
+                              CupertinoRadioChoice(
+                                  notSelectedColor: Color(0xFF527DAA),
+                                  selectedColor: Colors.lightGreen,
+                                  choices: genderMap,
+                                  onChange: onActionSelected,
+                                  initialKeyValue: _firstRadio),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        bottomNavi(),
+                        SizedBox(
+                          height: 40.0,
                         ),
                       ]),
                 )),
@@ -465,43 +453,4 @@ class _StockMoveState extends State<StockMove> {
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
-}
-
-final kLabelStyle = TextStyle(
-  color: Color(0xFF527DAA),
-  fontWeight: FontWeight.bold,
-  fontFamily: 'OpenSans',
-);
-
-Widget normalCard(String content, IconData ico) {
-  return Padding(
-    padding: EdgeInsets.all(5.0),
-    child: Card(
-      // color: Color(0xFF527DAA),
-      color: Colors.white,
-      child: ListTile(
-        leading: Icon(
-          ico,
-          color: Color(0xFF527DAA),
-          size: 25,
-        ),
-        title: Text(
-          content,
-          style: kLabelStyle,
-        ),
-      ),
-    ),
-  );
-}
-
-Widget normalTitle(String content) {
-  return Text(
-    content,
-    style: TextStyle(
-      color: Color(0xFF527DAA),
-      fontFamily: 'OpenSans',
-      fontSize: 30.0,
-      fontWeight: FontWeight.bold,
-    ),
-  );
 }

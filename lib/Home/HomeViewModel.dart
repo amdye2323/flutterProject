@@ -2,6 +2,7 @@ import 'package:testflutter/DTO/BarcodeZone.dart';
 import 'package:testflutter/DTO/PickingList.dart';
 import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/barcodeCheckList.dart';
+import 'package:testflutter/DTO/skuZoneList.dart';
 
 import '../DTO/skuInfo.dart';
 import '../service/stockService.dart';
@@ -41,16 +42,26 @@ class HomeViewModel {
   }
 
   Future<String> stockMoveToCompany(
-      String scanBarcode, String userId, String qty) async {
-    return await _service.stockMoveToCompany(scanBarcode, userId, qty);
+      String scanBarcode, String userId, String qty, String oriQty) async {
+    return await _service.stockMoveToCompany(scanBarcode, userId, qty, oriQty);
   }
 
   Future<String> stockMoveToPickingZone(
-      String scanBarcode, String userId, String qty) async {
-    return await _service.stockMoveToPickingZone(scanBarcode, userId, qty);
+      String scanBarcode, String userId, String qty, String oriQty) async {
+    return await _service.stockMoveToPickingZone(
+        scanBarcode, userId, qty, oriQty);
+  }
+
+  Future<String> stockMoveDivision(
+      String scanBarcode, String userId, String qty, String oriQty) async {
+    return await _service.stockMoveDivision(scanBarcode, userId, qty, oriQty);
   }
 
   Future<List<skuInfo>> barcodeSkuList(String barcode) async {
     return await _service.barcodeSkuList(barcode);
+  }
+
+  Future<List<skuZoneList>> getSkuZoneList(String sku) async {
+    return await _service.getSkuZoneList(sku);
   }
 }

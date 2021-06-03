@@ -6,11 +6,13 @@ import 'package:testflutter/DTO/PickingList.dart';
 import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/barcodeCheckList.dart';
 import 'package:testflutter/DTO/corCode.dart';
+import 'package:testflutter/DTO/skuZoneList.dart';
 
 import '../DTO/skuInfo.dart';
 
 class stockService {
-  final String baseUrl = "http://172.30.1.1:8080";
+  final String baseUrl = "http://172.30.1.1:8072";
+  // final String baseUrl = "https://alpha.golink.co.kr:444";
   final Map<String, String> header = {
     "Content-Type": "application/json",
     "Accept": "application/json"
@@ -20,6 +22,9 @@ class stockService {
    * 바코드로 입고된 바코드 입력시 정보 호출
    */
   Future<List<skuInfo>> requestSkuInfo(String barcode) async {
+    if (barcode == "default") {
+      return null;
+    }
     String url = "${baseUrl}/api/barcode?barcode=${barcode}";
 
     if (barcode == "default") {
@@ -177,9 +182,35 @@ class stockService {
    * 거래선 출고
    */
   Future<String> stockMoveToCompany(
-      String scanBarcode, String userId, String qty) async {
+      String scanBarcode, String userId, String qty, String oriQty) async {
+    if (int.parse(oriQty) - int.parse(qty) < 0) {
+      return "error";
+    }
     String url =
         "${baseUrl}/api/stockMoveToCompany?scanBarcode=${scanBarcode}&userId=${userId}&qty=${qty}";
+
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody);
+
+    if (json["result"].toString() == "success") {
+      return "success";
+    } else {
+      return "error";
+    }
+  }
+
+  /**
+   * 피킹존 이동
+  */
+  Future<String> stockMoveToPickingZone(
+      String scanBarcode, String userId, String qty, String oriQty) async {
+    if (int.parse(oriQty) - int.parse(qty) < 0) {
+      return "error";
+    }
+    String url =
+        "${baseUrl}/api/stockMoveToPickingZone?scanBarcode=${scanBarcode}&userId=${userId}&qty=${qty}";
 
     var response = await http.get(url, headers: header);
 
@@ -194,12 +225,15 @@ class stockService {
   }
 
   /**
-   * 피킹리스트 이동
-  */
-  Future<String> stockMoveToPickingZone(
-      String scanBarcode, String userId, String qty) async {
+   * 분할등록
+   */
+  Future<String> stockMoveDivision(
+      String scanBarcode, String userId, String qty, String oriQty) async {
+    if (int.parse(oriQty) - int.parse(qty) < 0) {
+      return "error";
+    }
     String url =
-        "${baseUrl}/api/stockMoveToPickingZone?scanBarcode=${scanBarcode}&userId=${userId}&qty=${qty}";
+        "${baseUrl}/api/stockMoveDivision?scanBarcode=${scanBarcode}&userId=${userId}&qty=${qty}";
 
     var response = await http.get(url, headers: header);
 
@@ -230,6 +264,28 @@ class stockService {
     if (list.length == 0) {
       return Future.error("error");
     }
+    return list;
+  }
+
+  Future<List<skuZoneList>> getSkuZoneList(String sku) async {
+    String url = "${baseUrl}/api/getSkuZoneList?sku=${sku}";
+    if (sku == "") {
+      return null;
+    }
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody)["list"].cast<Map<String, dynamic>>();
+
+    var list =
+        json.map<skuZoneList>((json) => skuZoneList.fromJson(json)).toList();
+
+    // if (json["result"] == "nothing") {
+    //   return Future.error("error");
+    // }
+    // if (list.length == 0) {
+    //   return Future.error("error");
+    // }
     return list;
   }
 }
