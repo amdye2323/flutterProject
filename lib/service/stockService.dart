@@ -6,6 +6,7 @@ import 'package:testflutter/DTO/PickingList.dart';
 import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/barcodeCheckList.dart';
 import 'package:testflutter/DTO/corCode.dart';
+import 'package:testflutter/DTO/pickZoneInfo.dart';
 import 'package:testflutter/DTO/skuZoneList.dart';
 
 import '../DTO/skuInfo.dart';
@@ -286,6 +287,30 @@ class stockService {
     if (list.length == 0) {
       return Future.error("error");
     }
+    return list;
+  }
+
+  Future<List<pickZoneInfo>> getCompanyPickingZoneInquiry(
+      String corCode) async {
+    if (corCode == "") {
+      return null;
+    }
+    String url =
+        "${baseUrl}/api/getCompanyPickingZoneInquiry?corCode=${corCode}";
+    var response = await http.get(url, headers: header);
+    String responsBody = utf8.decode(response.bodyBytes);
+
+    var json = jsonDecode(responsBody)["list"].cast<Map<String, dynamic>>();
+
+    var list =
+        json.map<pickZoneInfo>((json) => pickZoneInfo.fromJson(json)).toList();
+
+    // if (json["result"] == "nothing") {
+    //   return Future.error("error");
+    // }
+    // if (list.length == 0) {
+    //   return Future.error("error");
+    // }
     return list;
   }
 }

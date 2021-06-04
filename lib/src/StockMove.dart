@@ -342,7 +342,7 @@ class _StockMoveState extends State<StockMove> {
                             if (!snapshot.hasData) {
                               return TextButton(
                                 child: Text(
-                                  "Please Your Material Barcode",
+                                  "제품을 스캔해주세요.",
                                   style: TextStyle(
                                       fontSize: 20,
                                       color: Color(0xFF527DAA),

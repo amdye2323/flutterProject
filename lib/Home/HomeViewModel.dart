@@ -2,6 +2,7 @@ import 'package:testflutter/DTO/BarcodeZone.dart';
 import 'package:testflutter/DTO/PickingList.dart';
 import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/barcodeCheckList.dart';
+import 'package:testflutter/DTO/pickZoneInfo.dart';
 import 'package:testflutter/DTO/skuZoneList.dart';
 
 import '../DTO/skuInfo.dart';
@@ -64,5 +65,10 @@ class HomeViewModel {
 
   Future<List<skuZoneList>> getSkuZoneList(String sku) async {
     return await _service.getSkuZoneList(sku);
+  }
+
+  Future<List<pickZoneInfo>> getCompanyPickingZoneInquiry(
+      String corCode) async {
+    return await _service.getCompanyPickingZoneInquiry(corCode);
   }
 }

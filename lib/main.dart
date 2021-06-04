@@ -5,6 +5,7 @@ import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/pick.dart';
 import 'package:testflutter/src/LoginScreen.dart';
 import 'package:testflutter/src/MainPage.dart';
+import 'package:testflutter/src/StockManage.dart';
 import 'package:testflutter/src/pickListView.dart';
 
 void main() => runApp(
@@ -38,7 +39,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         "MainPage": (context) => MainPage(),
-        "pickListView": (context) => pickListView()
+        "pickingManage": (context) => StockManage(),
+        "invoiceView": (context) => pickListView(),
       },
     );
   }

@@ -8,6 +8,7 @@ import 'package:testflutter/src/LoginScreen.dart';
 import 'package:testflutter/src/StockManage.dart';
 import 'package:testflutter/src/StockMove.dart';
 import 'package:testflutter/src/ZoneMove.dart';
+import 'package:testflutter/src/pickZoneManage.dart';
 
 import '../main.dart';
 
@@ -36,7 +37,7 @@ class _MainFulPageState extends State<MainFulPage> {
 
   static List<Widget> _widgetOptions = [
     FirstWidget(),
-    StockManage(),
+    // StockManage(),
     StockMove(),
     ZoneMove(),
     CheckInvoice(),
@@ -109,11 +110,11 @@ class _MainFulPageState extends State<MainFulPage> {
                     label: '홈',
                     backgroundColor: Colors.black,
                   ),
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.rectangle_fill_on_rectangle_fill),
-                    label: '피킹',
-                    backgroundColor: Colors.black,
-                  ),
+                  // BottomNavigationBarItem(
+                  //   icon: Icon(CupertinoIcons.rectangle_fill_on_rectangle_fill),
+                  //   label: '피킹',
+                  //   backgroundColor: Colors.black,
+                  // ),
                   BottomNavigationBarItem(
                     icon: Icon(CupertinoIcons.barcode_viewfinder),
                     label: '재고스캔',
@@ -147,13 +148,19 @@ class FirstWidget extends StatelessWidget {
         child: GestureDetector(
           child: Stack(
             children: <Widget>[
-              Container(
-                color: Colors.blue,
-                height: 200.0,
+              Column(
+                children: [
+                  Container(
+                    color: Colors.black,
+                    height: 200.0,
+                  ),
+                ],
               ),
               Container(
                 height: double.infinity,
+                alignment: Alignment.topCenter,
                 child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 20.0,
@@ -162,21 +169,61 @@ class FirstWidget extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        height: 20.0,
-                      ),
+                      // SizedBox(
+                      //   height: 20.0,
+                      // ),
                       Text(
                         'GOLINK',
                         style: TextStyle(
-                          color: Color(0xFF527DAA),
+                          color: Colors.white,
                           fontFamily: 'OpenSans',
                           fontSize: 40.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(
+                        height: 10.0,
+                      ),
+                      Text(
+                        "고링크 바코드 시스템",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'OpenSans',
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
                         height: 20.0,
                       ),
+                      Text(
+                        "조회 리스트",
+                        style: TextStyle(color: Colors.white38),
+                      ),
+                      Container(
+                          child: mainCard("피킹리스트 조회", "조회 하시려면 탭 해주세요.",
+                              CupertinoIcons.book, StockManage(), context)),
+                      Container(
+                          child: mainCard(
+                              "피킹존 조회 및 관리",
+                              "업체별로 조회 가능합니다.",
+                              CupertinoIcons.square_favorites,
+                              pickZoneManage(),
+                              context)),
+                      Container(
+                          child: mainCard(
+                              "사용자 바코드 이력 조회",
+                              "일일 형식으로 조회 가능합니다.",
+                              CupertinoIcons.barcode,
+                              pickZoneManage(),
+                              context)),
+                      Container(
+                          child: mainCard(
+                              "사용자 송장체크 조회",
+                              "사용자가 송장 체크한 리스트만 조회",
+                              CupertinoIcons.square_stack_3d_down_right_fill,
+                              StockManage(),
+                              context)),
                     ],
                   ),
                 ),
@@ -203,14 +250,15 @@ Widget listCard(IconData iconData, String content) {
   return Card(
       color: Color(0xFF527DAA),
       child: ListTile(
-          leading: Icon(
-            iconData,
-            color: Colors.white,
-          ),
-          title: Text(
-            "접속자 이름 : ${content}",
-            style: TextStyle(color: Colors.white),
-          )));
+        leading: Icon(
+          iconData,
+          color: Colors.white,
+        ),
+        title: Text(
+          "접속자 이름 : ${content}",
+          style: TextStyle(color: Colors.white),
+        ),
+      ));
 }
 
 Widget normalCard(String content, IconData ico) {
@@ -234,7 +282,8 @@ Widget normalCard(String content, IconData ico) {
   );
 }
 
-Widget mainCard(String content, IconData ico) {
+Widget mainCard(String content, String subContent, IconData ico, Widget wiName,
+    BuildContext context) {
   return Padding(
     padding: EdgeInsets.all(5.0),
     child: Card(
@@ -243,17 +292,20 @@ Widget mainCard(String content, IconData ico) {
       child: ListTile(
         leading: Icon(
           ico,
-          color: Colors.white,
+          color: Colors.black,
           size: 25,
         ),
         title: Text(
           content,
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'OpenSans',
-          ),
+          style: kBlackLabelStyle,
         ),
+        subtitle: Text(subContent),
+        onTap: () {
+          // Navigator.popAndPushNamed(context, pushName);
+          // Navigator.pushNamed(context, pushName);
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => wiName));
+        },
       ),
     ),
   );
@@ -273,6 +325,12 @@ Widget normalTitle(String content) {
 
 final kLabelStyle = TextStyle(
   color: Color(0xFF527DAA),
+  fontWeight: FontWeight.bold,
+  fontFamily: 'OpenSans',
+);
+
+final kBlackLabelStyle = TextStyle(
+  color: Colors.blue,
   fontWeight: FontWeight.bold,
   fontFamily: 'OpenSans',
 );

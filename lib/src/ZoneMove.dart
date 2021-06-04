@@ -323,7 +323,7 @@ class _ZoneMoveState extends State<ZoneMove> {
                       if (!snapshot.hasData) {
                         return TextButton(
                           child: Text(
-                            "Please Your Material Barcode",
+                            "구역을 스캔해주세요.",
                             style: TextStyle(
                                 fontSize: 20,
                                 color: Color(0xFF527DAA),
@@ -364,7 +364,7 @@ class _ZoneMoveState extends State<ZoneMove> {
                                                 selectTapBarcode =
                                                     "${snapshot.data[index].barcode}";
                                                 oriQty =
-                                                    " 개수 : ${snapshot.data[index].qty} ";
+                                                    "${snapshot.data[index].qty} ";
                                               });
                                             },
                                             leading: Icon(

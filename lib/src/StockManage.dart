@@ -9,14 +9,23 @@ import 'package:testflutter/src/pickListView.dart';
 
 import '../main.dart';
 
-class StockManage extends StatefulWidget {
+class StockManage extends StatelessWidget {
   const StockManage({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StockManageFul();
+  }
+}
+
+class StockManageFul extends StatefulWidget {
+  const StockManageFul({Key key}) : super(key: key);
 
   @override
   _StockManageState createState() => _StockManageState();
 }
 
-class _StockManageState extends State<StockManage> {
+class _StockManageState extends State<StockManageFul> {
   final _viewModel = HomeViewModel();
   DateTime currentTime = DateTime.now();
   String corCode = "";
@@ -188,8 +197,7 @@ class _StockManageState extends State<StockManage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
+    return Scaffold(
       body: GestureDetector(
         child: Stack(
           children: <Widget>[
@@ -268,6 +276,6 @@ class _StockManageState extends State<StockManage> {
           ],
         ),
       ),
-    ));
+    );
   }
 }
