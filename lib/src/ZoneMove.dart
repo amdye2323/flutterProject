@@ -90,7 +90,6 @@ class _ZoneMoveState extends State<ZoneMove> {
     } else {
       showToastInstance("바코드를 확안해주세요.");
     }
-
     if (!mounted) return;
   }
 

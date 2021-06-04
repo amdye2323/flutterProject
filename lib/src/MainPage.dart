@@ -148,35 +148,36 @@ class FirstWidget extends StatelessWidget {
           child: Stack(
             children: <Widget>[
               Container(
+                color: Colors.blue,
+                height: 200.0,
+              ),
+              Container(
                 height: double.infinity,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: 20.0,
-                    vertical: 120.0,
+                    vertical: 50.0,
                   ),
-                  child: Consumer<UserModel>(
-                    builder: (context, user, child) {
-                      return Flex(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          direction: Axis.vertical,
-                          children: <Widget>[
-                            Text(
-                              'GOLINK',
-                              style: TextStyle(
-                                color: Color(0xFF527DAA),
-                                fontFamily: 'OpenSans',
-                                fontSize: 40.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            listCard(CupertinoIcons.info, user.userId),
-                            listCard(CupertinoIcons.person_alt, user.userName),
-                          ]);
-                    },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      Text(
+                        'GOLINK',
+                        style: TextStyle(
+                          color: Color(0xFF527DAA),
+                          fontFamily: 'OpenSans',
+                          fontSize: 40.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -227,6 +228,31 @@ Widget normalCard(String content, IconData ico) {
         title: Text(
           content,
           style: kLabelStyle,
+        ),
+      ),
+    ),
+  );
+}
+
+Widget mainCard(String content, IconData ico) {
+  return Padding(
+    padding: EdgeInsets.all(5.0),
+    child: Card(
+      // color: Color(0xFF527DAA),
+      color: Colors.white,
+      child: ListTile(
+        leading: Icon(
+          ico,
+          color: Colors.white,
+          size: 25,
+        ),
+        title: Text(
+          content,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'OpenSans',
+          ),
         ),
       ),
     ),
