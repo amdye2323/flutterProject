@@ -7,7 +7,7 @@ import 'package:testflutter/DTO/pick.dart';
 import 'package:testflutter/Home/HomeViewModel.dart';
 import 'package:testflutter/src/pickListView.dart';
 
-import '../main.dart';
+import '../../main.dart';
 
 class StockManage extends StatelessWidget {
   const StockManage({Key key}) : super(key: key);
@@ -276,6 +276,10 @@ class _StockManageState extends State<StockManageFul> {
           ],
         ),
       ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(CupertinoIcons.return_icon),
+          onPressed: () => Navigator.pop(context),
+        )
     );
   }
 }

@@ -5,8 +5,6 @@ import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/pick.dart';
 import 'package:testflutter/src/LoginScreen.dart';
 import 'package:testflutter/src/MainPage.dart';
-import 'package:testflutter/src/StockManage.dart';
-import 'package:testflutter/src/pickListView.dart';
 
 void main() => runApp(
       MultiProvider(
@@ -27,20 +25,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Flutter Returnbox",
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          color: Colors.transparent,
-          elevation: 0.0,
-        ),
-      ),
+      // title: "Flutter Returnbox",
+      // debugShowCheckedModeBanner: false,
+      // theme: ThemeData(
+      //   appBarTheme: AppBarTheme(
+      //     color: Colors.transparent,
+      //     elevation: 0.0,
+      //   ),
+      // ),
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
         "MainPage": (context) => MainPage(),
-        "pickingManage": (context) => StockManage(),
-        "invoiceView": (context) => pickListView(),
       },
     );
   }

@@ -281,12 +281,12 @@ class stockService {
     var list =
         json.map<skuZoneList>((json) => skuZoneList.fromJson(json)).toList();
 
-    if (json["result"] == "nothing") {
-      return Future.error("error");
-    }
-    if (list.length == 0) {
-      return Future.error("error");
-    }
+    // if (json["result"] == "nothing") {
+    //   return Future.error("error");
+    // }
+    // if (list.length == 0) {
+    //   return Future.error("error");
+    // }
     return list;
   }
 

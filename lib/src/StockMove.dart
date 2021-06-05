@@ -171,34 +171,8 @@ class _StockMoveState extends State<StockMove> {
       showToastInstance("바코드를 확안해주세요.");
     }
 
-    // if (barcodeScanRes.length == 16) {
-    //   if (barcodeStatus == false) {
-    //     setState(() {
-    //       _scanBarcode = barcodeScanRes;
-    //       skuDetail = _viewModel.skuDetail(_scanBarcode);
-    //       barcodeStatus = true;
-    //     });
-    //   } else {
-    //     showToastInstance("대상지역을 스캔해주세요.");
-    //   }
-    // } else if (barcodeScanRes.length == 10) {
-    //   if (barcodeStatus == true) {
-    //     setState(() {
-    //       _zoneBarcode = barcodeScanRes;
-    //       barZone = _viewModel.getBarcodeZone(_zoneBarcode);
-    //     });
-    //   } else {
-    //     showToastInstance("대상 지역이 아닙니다.");
-    //   }
-    // } else {
-    //   showToastInstance("바코드를 확안해주세요.");
-    // }
     if (!mounted) return;
 
-    // setState(() {
-    //   _scanBarcode = barcodeScanRes;
-    //   skuDetail = _viewModel.skuDetail(_scanBarcode);
-    // });
   }
 
   /**
