@@ -132,7 +132,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
               "#ff6666", "Cancel", false, ScanMode.BARCODE)
           .listen((barcode) {
         int barcodeSize = barcode.toString().length;
-        if (_checkBarcode != barcode && barcodeSize == 8) {
+        if (_checkBarcode != barcode && barcodeSize == 23) {
           FlutterBeep.beep();
           Fluttertoast.showToast(
               msg: "${barcode}가 등록되었습니다.",
@@ -172,7 +172,9 @@ class _CheckInvoiceState extends State<CheckInvoice> {
           body: Builder(builder: (BuildContext context) {
             return Stack(
               children: [
-                // backWallpaper(),
+                Container(
+                  width: double.infinity,
+                ),
                 Container(
                   alignment: Alignment.center,
                   height: double.infinity,
@@ -183,28 +185,39 @@ class _CheckInvoiceState extends State<CheckInvoice> {
                       SizedBox(
                         height: 60.0,
                       ),
-                      _checkBarcodeList.length == 0
-                          ? ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                Color(0xFF527DAA),
-                              )),
-                              onPressed: () => startBarcodeScanStream(),
-                              child: Text(
-                                '송장번호 체크',
-                                style: TextStyle(color: Colors.white),
-                              ))
-                          : TextButton(
-                              onPressed: () {
-                                FlutterDialog(context);
-                              },
-                              child: Text(
-                                "송장번호 리스트",
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  color: Color(0xFF6CA8F1),
-                                ),
-                              )),
+                      Container(
+                        child: _checkBarcodeList.length == 0
+                            ? ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                  Color(0xFF527DAA),
+                                )),
+                                onPressed: () => startBarcodeScanStream(),
+                                child: Text(
+                                  '송장번호 체크',
+                                  style: TextStyle(color: Colors.white),
+                                ))
+                            : Flex(
+                                direction: Axis.vertical,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "송장 번호 리스트",
+                                    style: TextStyle(
+                                        color: Color(0xFF527DAA),
+                                        fontSize: 30.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    "현재 [${_checkBarcodeList.length}] 스캔",
+                                    style: TextStyle(
+                                        color: Color(0xFF527DAA),
+                                        fontSize: 30.0,
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
+                      ),
                       Expanded(
                           child: Padding(
                         padding: EdgeInsets.all(10.0),
@@ -213,16 +226,19 @@ class _CheckInvoiceState extends State<CheckInvoice> {
                               SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2, childAspectRatio: 4.0),
                           itemBuilder: (BuildContext context, int index) {
-                            return GridTileBar(
-                              backgroundColor: Colors.lightBlue,
-                              leading: Icon(CupertinoIcons.barcode),
-                              title: Text(
-                                "${_checkBarcodeList[index]}",
-                                textAlign: TextAlign.center,
-                              ),
-                              trailing: IconButton(
-                                onPressed: () => deleteItemList(index),
-                                icon: Icon(CupertinoIcons.delete),
+                            return Container(
+                              padding: EdgeInsets.all(5),
+                              child: GridTileBar(
+                                backgroundColor: Colors.lightBlue,
+                                leading: Icon(CupertinoIcons.barcode),
+                                title: Text(
+                                  "${_checkBarcodeList[index]}",
+                                  textAlign: TextAlign.center,
+                                ),
+                                trailing: IconButton(
+                                  onPressed: () => deleteItemList(index),
+                                  icon: Icon(CupertinoIcons.delete),
+                                ),
                               ),
                             );
                           },

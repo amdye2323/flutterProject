@@ -2,6 +2,8 @@ import 'package:testflutter/DTO/BarcodeZone.dart';
 import 'package:testflutter/DTO/PickingList.dart';
 import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/barcodeCheckList.dart';
+import 'package:testflutter/DTO/barcodeHistoryInfo.dart';
+import 'package:testflutter/DTO/barcodeInvoiceInfo.dart';
 import 'package:testflutter/DTO/pickZoneInfo.dart';
 import 'package:testflutter/DTO/skuZoneList.dart';
 
@@ -70,5 +72,21 @@ class HomeViewModel {
   Future<List<pickZoneInfo>> getCompanyPickingZoneInquiry(
       String corCode) async {
     return await _service.getCompanyPickingZoneInquiry(corCode);
+  }
+
+  Future<String> revertPickZoneMaterial(String barcode, String sku, String qty,
+      String oriQty, String userId) async {
+    return await _service.revertPickZoneMaterial(
+        barcode, sku, qty, oriQty, userId);
+  }
+
+  Future<List<barcodeHistoryInfo>> getUserPushedBarcodeList(
+      String userId, String searchDate) async {
+    return await _service.getUserPushedBarcodeList(userId, searchDate);
+  }
+
+  Future<List<barcodeInvoiceInfo>> getUserPushedInvoiceList(
+      String userId, String searchDate) async {
+    return await _service.getUserPushedInvoiceList(userId, searchDate);
   }
 }

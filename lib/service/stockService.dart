@@ -5,6 +5,8 @@ import 'package:testflutter/DTO/BarcodeZone.dart';
 import 'package:testflutter/DTO/PickingList.dart';
 import 'package:testflutter/DTO/User.dart';
 import 'package:testflutter/DTO/barcodeCheckList.dart';
+import 'package:testflutter/DTO/barcodeHistoryInfo.dart';
+import 'package:testflutter/DTO/barcodeInvoiceInfo.dart';
 import 'package:testflutter/DTO/corCode.dart';
 import 'package:testflutter/DTO/pickZoneInfo.dart';
 import 'package:testflutter/DTO/skuZoneList.dart';
@@ -12,7 +14,7 @@ import 'package:testflutter/DTO/skuZoneList.dart';
 import '../DTO/skuInfo.dart';
 
 class stockService {
-  final String baseUrl = "http://172.30.1.1:8072";
+  final String baseUrl = "http://192.168.0.10:8072";
   // final String baseUrl = "https://alpha.golink.co.kr:444";
   final Map<String, String> header = {
     "Content-Type": "application/json",
@@ -311,6 +313,69 @@ class stockService {
     // if (list.length == 0) {
     //   return Future.error("error");
     // }
+    return list;
+  }
+
+  Future<String> revertPickZoneMaterial(String barcode, String sku, String qty,
+      String oriQty, String userId) async {
+    if (int.parse(oriQty) - int.parse(qty) < 0) {
+      return "error";
+    }
+    String url =
+        "${baseUrl}/api/revertPickZoneMaterial?barcode=${barcode}&sku=${sku}&qty=${qty}&userId=${userId}";
+    var response = await http.get(url, headers: header);
+    String responseBody = utf8.decode(response.bodyBytes);
+
+    var json = jsonDecode(responseBody);
+    if (json["result"] == "success") {
+      return "success";
+    } else {
+      return null;
+    }
+    return null;
+  }
+
+  Future<List<barcodeHistoryInfo>> getUserPushedBarcodeList(
+      String userId, String searchDate) async {
+    if (searchDate == "") {
+      return null;
+    }
+    String url =
+        "${baseUrl}/api/getUserPushedBarcodeList?date=${searchDate}&userId=${userId}";
+    var response = await http.get(url, headers: header);
+    String responsBody = utf8.decode(response.bodyBytes);
+
+    var json = jsonDecode(responsBody)["list"].cast<Map<String, dynamic>>();
+
+    var list = json
+        .map<barcodeHistoryInfo>((json) => barcodeHistoryInfo.fromJson(json))
+        .toList();
+
+    if (list.length == 0) {
+      return null;
+    }
+    return list;
+  }
+
+  Future<List<barcodeInvoiceInfo>> getUserPushedInvoiceList(
+      String userId, String searchDate) async {
+    if (searchDate == "") {
+      return null;
+    }
+    String url =
+        "${baseUrl}/api/getUserPushedInvoiceList?date=${searchDate}&userId=${userId}";
+    var response = await http.get(url, headers: header);
+    String responsBody = utf8.decode(response.bodyBytes);
+
+    var json = jsonDecode(responsBody)["list"].cast<Map<String, dynamic>>();
+
+    var list = json
+        .map<barcodeHistoryInfo>((json) => barcodeHistoryInfo.fromJson(json))
+        .toList();
+
+    if (list.length == 0) {
+      return null;
+    }
     return list;
   }
 }

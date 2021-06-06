@@ -38,6 +38,7 @@ class _ZoneMoveState extends State<ZoneMove> {
     '구역지정': '구역지정',
     '거래선출고': '거래선출고',
     '피킹구역': '피킹구역',
+    '분할등록': '분할등록'
   };
 
   @override
@@ -150,6 +151,18 @@ class _ZoneMoveState extends State<ZoneMove> {
           skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
         });
         return;
+      case "분할등록":
+        httpResult = await _viewModel.stockMoveDivision(
+            _zoneBarcode, _zoneBarcode, userId, dataQty, oriQty, "");
+        if (httpResult == "success") {
+          showToastInstance("성공적으로 등록되었습니다.");
+        } else {
+          showToastInstance("정보를 다시 한번 확인해주세요");
+        }
+        setState(() {
+          skuDetail = _viewModel.skuDetail(_zoneBarcode);
+        });
+        return;
     }
   }
 
@@ -194,6 +207,10 @@ class _ZoneMoveState extends State<ZoneMove> {
                     height: 20.0,
                   ),
                   TextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter(RegExp('[0-9]'))
+                    ],
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: '수량',
@@ -216,53 +233,76 @@ class _ZoneMoveState extends State<ZoneMove> {
   }
 
   Widget bottomNavi() {
-    if (_firstRadio == "구역지정") {
+    if (_firstRadio == "구역지정" || _firstRadio == "분할등록") {
       return FutureBuilder<BarcodeZone>(
           future: barZone,
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return TextButton(
-                  onPressed: () {
-                    scanBarcodeNormal();
-                  },
-                  child: Text(
-                    _bottomMent,
-                    style: TextStyle(fontSize: 20, color: Color(0xFF527DAA)),
-                  ));
+              return Container(
+                alignment: Alignment.center,
+                width: double.infinity,
+                height: 220,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: TextButton(
+                    onPressed: () {
+                      scanBarcodeNormal();
+                    },
+                    child: Text(
+                      _bottomMent,
+                      style: TextStyle(fontSize: 20, color: Color(0xFF527DAA)),
+                    )),
+              );
             } else if (snapshot.hasError) {
-              return Text("에러입니다.");
+              return Container(
+                alignment: Alignment.center,
+                width: double.infinity,
+                height: 220,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: Text("에러입니다"),
+              );
             } else if (snapshot.hasData) {
-              return Card(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      leading: Icon(
-                        CupertinoIcons.rectangle_fill_on_rectangle_fill,
-                        color: Color(0xFF527DAA),
-                      ),
-                      title: Text(
-                        "${snapshot.data.storageZone}",
-                        style: kLabelStyle,
-                      ),
-                      subtitle: Text(
-                        "${snapshot.data.statusZone}",
-                        style: kLabelStyle,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "${snapshot.data.storageZoneBarcode}",
+              return Container(
+                height: 220,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: Card(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        leading: Icon(
+                          CupertinoIcons.rectangle_fill_on_rectangle_fill,
+                          color: Color(0xFF527DAA),
+                        ),
+                        title: Text(
+                          "${snapshot.data.storageZone}",
                           style: kLabelStyle,
                         ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5.0,
-                    )
-                  ],
+                        subtitle: Text(
+                          "${snapshot.data.statusZone}",
+                          style: kLabelStyle,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${snapshot.data.storageZoneBarcode}",
+                            style: kLabelStyle,
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5.0,
+                      )
+                    ],
+                  ),
                 ),
               );
             } else {
@@ -294,179 +334,211 @@ class _ZoneMoveState extends State<ZoneMove> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
-          height: double.infinity,
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            child: Flex(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              direction: Axis.vertical,
-              children: <Widget>[
-                SizedBox(
-                  height: 30.0,
-                ),
-                Text("구역 바코드 리스트",
-                    style: TextStyle(
-                        fontSize: 30.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF527DAA))),
-                SizedBox(
-                  height: 20.0,
-                ),
-                FutureBuilder<List<skuInfo>>(
-                    future: skuDetail,
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return TextButton(
-                          child: Text(
-                            "구역을 스캔해주세요.",
-                            style: TextStyle(
-                                fontSize: 20,
-                                color: Color(0xFF527DAA),
-                                decoration: TextDecoration.underline),
+    return Scaffold(
+      body: Builder(builder: (BuildContext context) {
+        return Stack(
+          children: <Widget>[
+            Container(
+              color: Color(0xFF527DAA),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
+              height: double.infinity,
+              alignment: Alignment.topCenter,
+              child: SingleChildScrollView(
+                child: Flex(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  direction: Axis.vertical,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(horizontal: 1.0),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10.0)),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 10.0,
                           ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text("에러입니다.");
-                      } else if (snapshot.hasData) {
-                        return SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: Column(
-                            children: [
-                              Text(
-                                "${snapshot.data[0].storageZone}",
-                                style: kLabelStyle,
-                              ),
-                              Container(
-                                height: 250,
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: snapshot.data.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return Padding(
-                                        padding: EdgeInsets.all(5.0),
-                                        child: Card(
-                                          // color: Color(0xFF527DAA),
-                                          color: selectTapBarcode ==
-                                                  '${snapshot.data[index].barcode}'
-                                              ? Colors.white30
-                                              : Colors.white,
-                                          child: ListTile(
-                                            key: ValueKey(
-                                                snapshot.data[index].sku),
-                                            onTap: () {
-                                              setState(() {
-                                                selectTapBarcode =
-                                                    "${snapshot.data[index].barcode}";
-                                                oriQty =
-                                                    "${snapshot.data[index].qty} ";
-                                              });
-                                            },
-                                            leading: Icon(
-                                              CupertinoIcons.barcode,
-                                              color: Color(0xFF527DAA),
-                                              size: 25,
-                                            ),
-                                            title: Text(
-                                              "${snapshot.data[index].barcode}",
-                                              style: kLabelStyle,
-                                            ),
-                                            subtitle: Text(
-                                              "${snapshot.data[index].skuLabel} [${snapshot.data[index].qty}]",
-                                              style: kLabelStyle,
-                                            ),
+                          Text("구역 바코드 리스트",
+                              style: TextStyle(
+                                  fontSize: 30.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF527DAA))),
+                          SizedBox(
+                            height: 20.0,
+                          ),
+                          FutureBuilder<List<skuInfo>>(
+                              future: skuDetail,
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Container(
+                                      height: 250,
+                                      child: IconButton(
+                                        color: Color(0xFF527DAA),
+                                        icon: Icon(
+                                            CupertinoIcons.add_circled_solid),
+                                        iconSize: 30,
+                                        onPressed: scanBarcodeNormal,
+                                      ));
+                                } else if (snapshot.hasError) {
+                                  return Container(
+                                    height: 220,
+                                    child: Text("에러입니다."),
+                                  );
+                                } else if (snapshot.hasData) {
+                                  return Container(
+                                    height: 220,
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.vertical,
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "${snapshot.data[0].storageZone}",
+                                            style: kLabelStyle,
                                           ),
-                                        ),
-                                      );
-                                    }),
-                              ),
+                                          Container(
+                                            child: ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: snapshot.data.length,
+                                                itemBuilder:
+                                                    (BuildContext context,
+                                                        int index) {
+                                                  return Padding(
+                                                    padding:
+                                                        EdgeInsets.all(5.0),
+                                                    child: Card(
+                                                      // color: Color(0xFF527DAA),
+                                                      color: selectTapBarcode ==
+                                                              '${snapshot.data[index].barcode}'
+                                                          ? Colors.white30
+                                                          : Colors.white,
+                                                      child: ListTile(
+                                                        key: ValueKey(snapshot
+                                                            .data[index].sku),
+                                                        onTap: () {
+                                                          setState(() {
+                                                            selectTapBarcode =
+                                                                "${snapshot.data[index].barcode}";
+                                                            oriQty =
+                                                                "${snapshot.data[index].qty} ";
+                                                          });
+                                                        },
+                                                        leading: Icon(
+                                                          CupertinoIcons
+                                                              .barcode,
+                                                          color:
+                                                              Color(0xFF527DAA),
+                                                          size: 25,
+                                                        ),
+                                                        title: Text(
+                                                          "${snapshot.data[index].barcode}",
+                                                          style: kLabelStyle,
+                                                        ),
+                                                        subtitle: Text(
+                                                          "${snapshot.data[index].skuLabel} [${snapshot.data[index].qty}]",
+                                                          style: kLabelStyle,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                }),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return CircularProgressIndicator();
+                                }
+                              }),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15.0,
+                    ),
+                    SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Container(
+                          height: 80,
+                          padding: EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10.0)),
+                          child: Flex(
+                            direction: Axis.horizontal,
+                            children: [
+                              CupertinoRadioChoice(
+                                  notSelectedColor: Colors.black45,
+                                  selectedColor: Colors.blueAccent,
+                                  choices: genderMap,
+                                  onChange: onActionSelected,
+                                  initialKeyValue: _firstRadio),
                             ],
                           ),
-                        );
-                      } else {
-                        return CircularProgressIndicator();
-                      }
-                    }),
-                Icon(
-                  CupertinoIcons.arrowtriangle_down_fill,
-                  size: 40,
+                        )),
+                    SizedBox(
+                      height: 15.0,
+                    ),
+                    bottomNavi(),
+                    SizedBox(
+                      height: 40.0,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: FloatingActionButton(
+                backgroundColor: Colors.white,
+                onPressed: () {
+                  scanBarcodeNormal();
+                },
+                child: Icon(
+                  CupertinoIcons.barcode,
                   color: Color(0xFF527DAA),
                 ),
-                SizedBox(
-                  height: 10.0,
-                ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Flex(
-                    direction: Axis.horizontal,
-                    children: [
-                      CupertinoRadioChoice(
-                          notSelectedColor: Color(0xFF527DAA),
-                          selectedColor: Colors.lightGreen,
-                          choices: genderMap,
-                          onChange: onActionSelected,
-                          initialKeyValue: _firstRadio),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                bottomNavi(),
-                SizedBox(
-                  height: 30.0,
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: FloatingActionButton(
-            backgroundColor: Colors.white,
-            onPressed: () {
-              scanBarcodeNormal();
-            },
-            child: Icon(
-              CupertinoIcons.barcode,
-              color: Color(0xFF527DAA),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: FloatingActionButton(
+                backgroundColor: Colors.white,
+                onPressed: pageReset,
+                child: Icon(
+                  CupertinoIcons.arrow_uturn_left,
+                  color: Color(0xFF527DAA),
+                ),
+              ),
             ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: FloatingActionButton(
-            backgroundColor: Colors.white,
-            onPressed: pageReset,
-            child: Icon(
-              CupertinoIcons.arrow_uturn_left,
-              color: Color(0xFF527DAA),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: FloatingActionButton(
+                backgroundColor: Colors.white,
+                onPressed: () {
+                  if (_firstRadio == "구역지정") {
+                    stockMoveToZone(oriQty);
+                  } else {
+                    qtyDialog(context, oriQty);
+                  }
+                },
+                child: Icon(
+                  CupertinoIcons.check_mark,
+                  color: Color(0xFF527DAA),
+                ),
+              ),
             ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.bottomRight,
-          child: FloatingActionButton(
-            backgroundColor: Colors.white,
-            onPressed: () {
-              if (_firstRadio == "구역지정") {
-                stockMoveToZone(oriQty);
-              } else {
-                qtyDialog(context, oriQty);
-              }
-            },
-            child: Icon(
-              CupertinoIcons.check_mark,
-              color: Color(0xFF527DAA),
-            ),
-          ),
-        ),
-      ],
+          ],
+        );
+      }),
     );
   }
 }

@@ -172,7 +172,6 @@ class _StockMoveState extends State<StockMove> {
     }
 
     if (!mounted) return;
-
   }
 
   /**
@@ -205,6 +204,10 @@ class _StockMoveState extends State<StockMove> {
                     height: 20.0,
                   ),
                   TextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter(RegExp('[0-9]'))
+                    ],
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: '수량',
@@ -232,15 +235,35 @@ class _StockMoveState extends State<StockMove> {
           future: barZone,
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return Text(
-                _bottomMent,
-                style: TextStyle(fontSize: 20, color: Color(0xFF527DAA)),
+              return Container(
+                alignment: Alignment.center,
+                width: double.infinity,
+                height: 220,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: Text(
+                  _bottomMent,
+                  style: TextStyle(fontSize: 20, color: Color(0xFF527DAA)),
+                ),
               );
             } else if (snapshot.hasError) {
-              return Text("에러입니다.");
+              return Container(
+                alignment: Alignment.center,
+                width: double.infinity,
+                height: 220,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: Text("에러입니다"),
+              );
             } else if (snapshot.hasData) {
               return Container(
-                height: 250,
+                height: 220,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0)),
                 child: SingleChildScrollView(
                   child: Flex(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -264,24 +287,25 @@ class _StockMoveState extends State<StockMove> {
             }
           });
     } else {
-      return Column(
-        children: [
-          SizedBox(
-            height: 20.0,
-          ),
-          ElevatedButton(
-              onPressed: () {
-                qtyDialog(context, oriQty);
-              },
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                Color(0xFF527DAA),
-              )),
-              child: Text(
-                "등록하기",
-                style: TextStyle(fontSize: 20.0),
-              )),
-        ],
+      return Container(
+        width: double.infinity,
+        height: 220,
+        alignment: Alignment.center,
+        // color: Colors.white,
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
+        child: ElevatedButton(
+            onPressed: () {
+              qtyDialog(context, oriQty);
+            },
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+              Color(0xFF527DAA),
+            )),
+            child: Text(
+              "등록하기",
+              style: TextStyle(fontSize: 20.0),
+            )),
       );
     }
   }
@@ -292,7 +316,10 @@ class _StockMoveState extends State<StockMove> {
       body: Builder(builder: (BuildContext context) {
         return Stack(
           children: <Widget>[
-            // backWallpaper(),
+            Container(
+              color: Color(0xFF527DAA),
+              // color: Colors.black12,
+            ),
             Container(
                 padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
                 height: double.infinity,
@@ -304,84 +331,109 @@ class _StockMoveState extends State<StockMove> {
                       direction: Axis.vertical,
                       children: <Widget>[
                         SizedBox(
-                          height: 30.0,
+                          height: 20.0,
                         ),
-                        normalTitle("스캔 재고"),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        FutureBuilder<List<skuInfo>>(
-                          future: skuDetail,
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return TextButton(
-                                child: Text(
-                                  "제품을 스캔해주세요.",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: Color(0xFF527DAA),
-                                      decoration: TextDecoration.underline),
-                                ),
-                                onPressed: scanBarcodeNormal,
-                              );
-                            } else if (snapshot.hasError) {
-                              return Text("에러입니다.");
-                            } else if (snapshot.hasData) {
-                              oriQty = snapshot.data[0].qty;
-                              skuCode = snapshot.data[0].sku;
-                              return Container(
-                                  height: 250,
-                                  child: SingleChildScrollView(
-                                    child: Flex(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      direction: Axis.vertical,
-                                      children: [
-                                        normalCard(
-                                            "${snapshot.data[0].barcode}",
-                                            CupertinoIcons.barcode),
-                                        normalCard(
-                                            "${snapshot.data[0].skuLabel}",
-                                            CupertinoIcons.cube_box_fill),
-                                        normalCard(
-                                            "입고일 : " + snapshot.data[0].ioDate,
-                                            CupertinoIcons.calendar),
-                                        normalCard(
-                                            "재고 수량 : ${snapshot.data[0].qty}",
-                                            CupertinoIcons.number),
-                                        normalCard(
-                                            "보관 장소 : ${snapshot.data[0].storageZone}",
-                                            CupertinoIcons.eye_fill),
-                                      ],
-                                    ),
-                                  ));
-                            } else {
-                              return CircularProgressIndicator();
-                            }
-                          },
-                        ),
-                        Icon(
-                          CupertinoIcons.arrowtriangle_down_fill,
-                          size: 40,
-                          color: Color(0xFF527DAA),
-                        ),
-                        // normalTitle("대상 구역"),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Flex(
-                            direction: Axis.horizontal,
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(horizontal: 1.0),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10.0)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              CupertinoRadioChoice(
-                                  notSelectedColor: Color(0xFF527DAA),
-                                  selectedColor: Colors.lightGreen,
-                                  choices: genderMap,
-                                  onChange: onActionSelected,
-                                  initialKeyValue: _firstRadio),
+                              SizedBox(
+                                height: 10.0,
+                              ),
+                              normalTitle("스캔 재고"),
+                              SizedBox(
+                                height: 10.0,
+                              ),
+                              FutureBuilder<List<skuInfo>>(
+                                future: skuDetail,
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return Container(
+                                        height: 250,
+                                        child: IconButton(
+                                          color: Color(0xFF527DAA),
+                                          icon: Icon(
+                                              CupertinoIcons.add_circled_solid),
+                                          iconSize: 30,
+                                          onPressed: scanBarcodeNormal,
+                                        ));
+                                  } else if (snapshot.hasError) {
+                                    return Container(
+                                      height: 220,
+                                      child: Text("에러입니다."),
+                                    );
+                                  } else if (snapshot.hasData) {
+                                    oriQty = snapshot.data[0].qty;
+                                    skuCode = snapshot.data[0].sku;
+                                    return Container(
+                                        height: 220,
+                                        child: SingleChildScrollView(
+                                          child: Flex(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            direction: Axis.vertical,
+                                            children: [
+                                              normalCard(
+                                                  "${snapshot.data[0].barcode}",
+                                                  CupertinoIcons.barcode),
+                                              normalCard(
+                                                  "${snapshot.data[0].skuLabel}",
+                                                  CupertinoIcons.cube_box_fill),
+                                              normalCard(
+                                                  "입고일 : " +
+                                                      snapshot.data[0].ioDate,
+                                                  CupertinoIcons.calendar),
+                                              normalCard(
+                                                  "재고 수량 : ${snapshot.data[0].qty}",
+                                                  CupertinoIcons.number),
+                                              normalCard(
+                                                  "보관 장소 : ${snapshot.data[0].storageZone}",
+                                                  CupertinoIcons.eye_fill),
+                                            ],
+                                          ),
+                                        ));
+                                  } else {
+                                    return CircularProgressIndicator();
+                                  }
+                                },
+                              ),
                             ],
                           ),
                         ),
+
+                        // Icon(CupertinoIcons.arrowtriangle_down_fill,
+                        //     size: 40, color: Colors.white),
+                        // normalTitle("대상 구역"),
                         SizedBox(
-                          height: 10.0,
+                          height: 15,
+                        ),
+                        SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 4),
+                              height: 80,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              child: Flex(
+                                direction: Axis.horizontal,
+                                children: [
+                                  CupertinoRadioChoice(
+                                      notSelectedColor: Colors.amber,
+                                      selectedColor: Colors.blueAccent,
+                                      choices: genderMap,
+                                      onChange: onActionSelected,
+                                      initialKeyValue: _firstRadio),
+                                ],
+                              ),
+                            )),
+                        SizedBox(
+                          height: 15.0,
                         ),
                         bottomNavi(),
                         SizedBox(

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:testflutter/src/MainView/StockManage.dart';
 import 'package:testflutter/src/MainView/pickZoneManage.dart';
 
+import 'barcodeHistoryView.dart';
+import 'barcodeInvoiceCheckListView.dart';
+
 class MainPageWidget extends StatelessWidget {
   const MainPageWidget({Key key}) : super(key: key);
 
@@ -39,7 +42,7 @@ class _MainPageWidgetFulState extends State<MainPageWidgetFul> {
                   Column(
                     children: [
                       Container(
-                        color: Colors.black,
+                        color: Color(0xFF527DAA),
                         height: 200.0,
                       ),
                     ],
@@ -142,13 +145,13 @@ class _MainPageWidgetFulState extends State<MainPageWidgetFul> {
                 CupertinoIcons.square_favorites, pickZoneManageFul())),
         Container(
             child: mainCard("사용자 바코드 이력 조회", "일일 형식으로 조회 가능합니다.",
-                CupertinoIcons.barcode, pickZoneManageFul())),
+                CupertinoIcons.barcode, barcodeHistoryView())),
         Container(
             child: mainCard(
                 "사용자 송장체크 조회",
                 "사용자가 송장 체크한 리스트만 조회",
                 CupertinoIcons.square_stack_3d_down_right_fill,
-                pickZoneManageFul())),
+                barcodeInvoiceCheckListView())),
       ],
     );
   }

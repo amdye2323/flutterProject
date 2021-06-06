@@ -156,23 +156,27 @@ Widget listCard(IconData iconData, String content) {
 }
 
 Widget normalCard(String content, IconData ico) {
-  return Padding(
+  return Container(
     padding: EdgeInsets.all(5.0),
     child: Card(
-      // color: Color(0xFF527DAA),
-      color: Colors.white,
-      child: ListTile(
-        leading: Icon(
-          ico,
-          color: Color(0xFF527DAA),
-          size: 25,
-        ),
-        title: Text(
-          content,
-          style: kLabelStyle,
-        ),
-      ),
-    ),
+        // color: Color(0xFF527DAA),
+        color: Colors.white,
+        child: Container(
+          decoration: BoxDecoration(
+              border:
+                  Border(top: BorderSide(color: Color(0xFF527DAA), width: 2))),
+          child: ListTile(
+            leading: Icon(
+              ico,
+              color: Color(0xFF527DAA),
+              size: 25,
+            ),
+            title: Text(
+              content,
+              style: kLabelStyle,
+            ),
+          ),
+        )),
   );
 }
 

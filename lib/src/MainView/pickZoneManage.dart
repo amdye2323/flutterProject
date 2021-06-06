@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_select/smart_select.dart';
@@ -8,17 +9,6 @@ import 'package:testflutter/DTO/skuZoneList.dart';
 import 'package:testflutter/Home/HomeViewModel.dart';
 
 import '../../main.dart';
-
-// class pickZoneManage extends StatelessWidget {
-//   const pickZoneManage({Key key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: pickZoneManageFul(),
-//     );
-//   }
-// }
 
 class pickZoneManageFul extends StatefulWidget {
   const pickZoneManageFul({Key key}) : super(key: key);
@@ -31,7 +21,6 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
   String corCode = "";
   String corCodeName = "업체선택";
   String userId = "";
-  String selectedTapBarcode = "";
 
   final _viewModel = HomeViewModel();
   final qtyController = TextEditingController();
@@ -44,13 +33,29 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
   void initState() {
     super.initState();
     corList = _viewModel.getCorCode();
-    String userId = Provider.of<UserModel>(context, listen: false).userId;
+
     pickList = _viewModel.getCompanyPickingZoneInquiry(corCode);
   }
 
   Future deleteSecureDate(String key) async {
     var deleteData = await storage.delete(key: key);
     return deleteData;
+  }
+
+  Future<void> revertPickZoneMaterial(
+      String barcode, String sku, String qty, String oriQty) async {
+    String userId = Provider.of<UserModel>(context, listen: false).userId;
+    String result = await _viewModel.revertPickZoneMaterial(
+        barcode, sku, qty, oriQty, userId);
+    if (result == "success") {
+      showToastInstance("성공적으로 등록되었습니다.");
+      zoneList = _viewModel.getSkuZoneList(sku);
+      pickList = _viewModel.getCompanyPickingZoneInquiry(corCode);
+    } else {
+      showToastInstance("정보를 다시 확인해주세요.");
+      zoneList = _viewModel.getSkuZoneList(sku);
+      pickList = _viewModel.getCompanyPickingZoneInquiry(corCode);
+    }
   }
 
   /**
@@ -101,9 +106,9 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
     );
   }
 
-  Future<void> skuZoneDialog(
-      BuildContext context, String oriQty, String sku) async {
+  void skuDialog(BuildContext context, String oriQty, String sku) async {
     zoneList = _viewModel.getSkuZoneList(sku);
+    String selectedTapBarcode = "";
     showDialog(
         context: context,
         barrierDismissible: false,
@@ -134,9 +139,14 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
                               height: 30,
                               width: 100,
                               child: TextField(
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  WhitelistingTextInputFormatter(
+                                      RegExp('[0-9]'))
+                                ],
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(),
-                                  labelText: '수량',
+                                  labelText: '수량만 입력가능합니다',
                                 ),
                                 controller: qtyController,
                               )),
@@ -145,54 +155,68 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
                     ],
                   )),
             ),
-            content: Container(
-              height: 300,
-              width: 200,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    FutureBuilder(
-                        future: zoneList,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Text("데이터가 없습니다.");
-                          } else if (snapshot.hasError) {
-                            return Text("데이터가 없습니다.");
-                          } else if (snapshot.hasData) {
-                            return ListView.builder(
-                                itemCount: snapshot.data.length,
-                                shrinkWrap: true,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Card(
-                                    color: selectedTapBarcode ==
-                                            '${snapshot.data[index].storageMaterialBarcode}'
-                                        ? Colors.white30
-                                        : Colors.white,
-                                    child: ListTile(
-                                      onTap: () {
-                                        setState(() {
-                                          selectedTapBarcode = snapshot
-                                              .data[index]
-                                              .storageMaterialBarcode;
-                                        });
-                                      },
-                                      title: Text(
-                                          "${snapshot.data[index].storageZone}[${snapshot.data[index].qty} 개]"),
-                                      subtitle: Text(
-                                          "barcode : ${snapshot.data[index].storageMaterialBarcode}"),
-                                    ),
-                                  );
-                                });
-                          } else {
-                            return CircularProgressIndicator();
-                          }
-                        })
-                  ],
-                ),
-              ),
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Container(
+                  height: 300,
+                  width: 200,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: [
+                        FutureBuilder(
+                            future: zoneList,
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Text("데이터가 없습니다.");
+                              } else if (snapshot.hasError) {
+                                return Text("데이터가 없습니다.");
+                              } else if (snapshot.hasData) {
+                                return ListView.builder(
+                                    itemCount: snapshot.data.length,
+                                    shrinkWrap: true,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return Card(
+                                        color: selectedTapBarcode ==
+                                                '${snapshot.data[index].storageMaterialBarcode}'
+                                            ? Colors.white30
+                                            : Colors.white,
+                                        child: ListTile(
+                                          key: ValueKey(snapshot.data[index]
+                                              .storageMaterialBarcode),
+                                          onTap: () {
+                                            setState(() {
+                                              selectedTapBarcode = snapshot
+                                                  .data[index]
+                                                  .storageMaterialBarcode;
+                                            });
+                                          },
+                                          title: Text(
+                                              "${snapshot.data[index].storageZone}[${snapshot.data[index].qty} 개]"),
+                                          subtitle: Text(
+                                              "barcode : ${snapshot.data[index].storageMaterialBarcode}"),
+                                        ),
+                                      );
+                                    });
+                              } else {
+                                return CircularProgressIndicator();
+                              }
+                            })
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
-            actions: [ElevatedButton(onPressed: () {}, child: Text("되돌리기"))],
+            actions: [
+              ElevatedButton(
+                  onPressed: () {
+                    revertPickZoneMaterial(
+                        selectedTapBarcode, sku, qtyController.text, oriQty);
+                  },
+                  child: Text("되돌리기"))
+            ],
           );
         });
   }
@@ -205,25 +229,22 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
             Container(
               // height: double.infinity,
               width: double.infinity,
-              color: Colors.black,
+              color: Color(0xFF527DAA),
             ),
             Container(
               // height: double.infinity,
               alignment: Alignment.topCenter,
-              color: Colors.black,
+              color: Color(0xFF527DAA),
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 physics: AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.symmetric(
                   horizontal: 20.0,
-                  vertical: 50.0,
+                  vertical: 30.0,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // SizedBox(
-                    //   height: 20.0,
-                    // ),
                     Text(
                       '피킹존리스트',
                       style: TextStyle(
@@ -243,7 +264,7 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 1.0),
                       child: Container(
-                        height: 600,
+                        height: 500,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -276,7 +297,7 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
                                               child: Card(
                                                 child: ListTile(
                                                   onTap: () {
-                                                    skuZoneDialog(
+                                                    skuDialog(
                                                         context,
                                                         snapshot
                                                             .data[index].qty,
