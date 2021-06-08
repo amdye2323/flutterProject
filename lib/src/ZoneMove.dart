@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:testflutter/DTO/BarcodeZone.dart';
 import 'package:testflutter/DTO/skuInfo.dart';
 import 'package:testflutter/Home/HomeViewModel.dart';
+import 'package:testflutter/src/MainPage.dart';
 
 import '../main.dart';
 
@@ -31,6 +32,7 @@ class _ZoneMoveState extends State<ZoneMove> {
   String _firstRadio = "구역지정";
   String _bottomMent = "여기를 눌러 스캔해주세요.";
   String selectTapBarcode = "";
+  String sku = "";
 
   final qtyController = TextEditingController();
 
@@ -57,6 +59,7 @@ class _ZoneMoveState extends State<ZoneMove> {
     selectTapBarcode = "";
     qty = ""; //입력 재고
     oriQty = ""; //현 재고
+    sku = "";
     setState(() {
       skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
       barZone = _viewModel.getBarcodeZone(_zoneBarcode);
@@ -153,7 +156,7 @@ class _ZoneMoveState extends State<ZoneMove> {
         return;
       case "분할등록":
         httpResult = await _viewModel.stockMoveDivision(
-            _zoneBarcode, _zoneBarcode, userId, dataQty, oriQty, "");
+            selectTapBarcode, _zoneBarcode, userId, dataQty, oriQty, sku);
         if (httpResult == "success") {
           showToastInstance("성공적으로 등록되었습니다.");
         } else {
@@ -244,6 +247,7 @@ class _ZoneMoveState extends State<ZoneMove> {
                 height: 220,
                 decoration: BoxDecoration(
                     color: Colors.white,
+                    border: BoxDeco(),
                     borderRadius: BorderRadius.circular(10.0)),
                 child: TextButton(
                     onPressed: () {
@@ -261,50 +265,35 @@ class _ZoneMoveState extends State<ZoneMove> {
                 height: 220,
                 decoration: BoxDecoration(
                     color: Colors.white,
+                    border: BoxDeco(),
                     borderRadius: BorderRadius.circular(10.0)),
                 child: Text("에러입니다"),
               );
             } else if (snapshot.hasData) {
               return Container(
-                height: 220,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10.0)),
-                child: Card(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        leading: Icon(
-                          CupertinoIcons.rectangle_fill_on_rectangle_fill,
-                          color: Color(0xFF527DAA),
-                        ),
-                        title: Text(
-                          "${snapshot.data.storageZone}",
-                          style: kLabelStyle,
-                        ),
-                        subtitle: Text(
-                          "${snapshot.data.statusZone}",
-                          style: kLabelStyle,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "${snapshot.data.storageZoneBarcode}",
-                            style: kLabelStyle,
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5.0,
-                      )
-                    ],
-                  ),
-                ),
-              );
+                  height: 220,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: BoxDeco(),
+                      borderRadius: BorderRadius.circular(10.0)),
+                  child: SingleChildScrollView(
+                    child: Flex(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      direction: Axis.vertical,
+                      children: [
+                        normalCard("${snapshot.data.storageZoneBarcode}",
+                            CupertinoIcons.barcode),
+                        normalCard("${snapshot.data.storageZone}",
+                            CupertinoIcons.eye_fill),
+                        normalCard("${snapshot.data.statusZone}",
+                            CupertinoIcons.tag_fill),
+                        SizedBox(
+                          height: 40.0,
+                        )
+                      ],
+                    ),
+                  ));
             } else {
               return CircularProgressIndicator();
             }
@@ -338,9 +327,9 @@ class _ZoneMoveState extends State<ZoneMove> {
       body: Builder(builder: (BuildContext context) {
         return Stack(
           children: <Widget>[
-            Container(
-              color: Color(0xFF527DAA),
-            ),
+            // Container(
+            //   color: Color(0xFF527DAA),
+            // ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
               height: double.infinity,
@@ -372,14 +361,19 @@ class _ZoneMoveState extends State<ZoneMove> {
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF527DAA))),
                           SizedBox(
-                            height: 20.0,
+                            height: 10.0,
                           ),
                           FutureBuilder<List<skuInfo>>(
                               future: skuDetail,
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
                                   return Container(
-                                      height: 250,
+                                      height: 220,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                          border: BoxDeco(),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
                                       child: IconButton(
                                         color: Color(0xFF527DAA),
                                         icon: Icon(
@@ -390,68 +384,65 @@ class _ZoneMoveState extends State<ZoneMove> {
                                 } else if (snapshot.hasError) {
                                   return Container(
                                     height: 220,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                        border: BoxDeco(),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0)),
                                     child: Text("에러입니다."),
                                   );
                                 } else if (snapshot.hasData) {
-                                  return Container(
-                                    height: 220,
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.vertical,
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            "${snapshot.data[0].storageZone}",
-                                            style: kLabelStyle,
-                                          ),
-                                          Container(
-                                            child: ListView.builder(
-                                                shrinkWrap: true,
-                                                itemCount: snapshot.data.length,
-                                                itemBuilder:
-                                                    (BuildContext context,
-                                                        int index) {
-                                                  return Padding(
-                                                    padding:
-                                                        EdgeInsets.all(5.0),
-                                                    child: Card(
-                                                      // color: Color(0xFF527DAA),
-                                                      color: selectTapBarcode ==
-                                                              '${snapshot.data[index].barcode}'
-                                                          ? Colors.white30
-                                                          : Colors.white,
-                                                      child: ListTile(
-                                                        key: ValueKey(snapshot
-                                                            .data[index].sku),
-                                                        onTap: () {
-                                                          setState(() {
-                                                            selectTapBarcode =
-                                                                "${snapshot.data[index].barcode}";
-                                                            oriQty =
-                                                                "${snapshot.data[index].qty} ";
-                                                          });
-                                                        },
-                                                        leading: Icon(
-                                                          CupertinoIcons
-                                                              .barcode,
-                                                          color:
-                                                              Color(0xFF527DAA),
-                                                          size: 25,
-                                                        ),
-                                                        title: Text(
-                                                          "${snapshot.data[index].barcode}",
-                                                          style: kLabelStyle,
-                                                        ),
-                                                        subtitle: Text(
-                                                          "${snapshot.data[index].skuLabel} [${snapshot.data[index].qty}]",
-                                                          style: kLabelStyle,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
-                                                }),
-                                          ),
-                                        ],
-                                      ),
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.vertical,
+                                    child: Container(
+                                      height: 220,
+                                      decoration: BoxDecoration(
+                                          border: BoxDeco(),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
+                                      child: ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: snapshot.data.length,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return Padding(
+                                              padding: EdgeInsets.all(5.0),
+                                              child: Card(
+                                                // color: Color(0xFF527DAA),
+                                                color: selectTapBarcode ==
+                                                        '${snapshot.data[index].barcode}'
+                                                    ? Colors.white30
+                                                    : Colors.white,
+                                                child: ListTile(
+                                                  key: ValueKey(
+                                                      snapshot.data[index].sku),
+                                                  onTap: () {
+                                                    setState(() {
+                                                      selectTapBarcode =
+                                                          "${snapshot.data[index].barcode}";
+                                                      oriQty =
+                                                          "${snapshot.data[index].qty} ";
+                                                      sku =
+                                                          "${snapshot.data[index].sku}";
+                                                    });
+                                                  },
+                                                  leading: Icon(
+                                                    CupertinoIcons.barcode,
+                                                    color: Color(0xFF527DAA),
+                                                    size: 25,
+                                                  ),
+                                                  title: Text(
+                                                    "${snapshot.data[index].barcode}",
+                                                    style: kLabelStyle,
+                                                  ),
+                                                  subtitle: Text(
+                                                    "${snapshot.data[index].skuLabel} [${snapshot.data[index].qty}]",
+                                                    style: kLabelStyle,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }),
                                     ),
                                   );
                                 } else {
@@ -476,7 +467,7 @@ class _ZoneMoveState extends State<ZoneMove> {
                             direction: Axis.horizontal,
                             children: [
                               CupertinoRadioChoice(
-                                  notSelectedColor: Colors.black45,
+                                  notSelectedColor: Colors.amber,
                                   selectedColor: Colors.blueAccent,
                                   choices: genderMap,
                                   onChange: onActionSelected,

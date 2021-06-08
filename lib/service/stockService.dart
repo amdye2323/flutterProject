@@ -14,7 +14,7 @@ import 'package:testflutter/DTO/skuZoneList.dart';
 import '../DTO/skuInfo.dart';
 
 class stockService {
-  final String baseUrl = "http://192.168.0.10:8072";
+  final String baseUrl = "http://172.30.1.1:8072";
   // final String baseUrl = "https://alpha.golink.co.kr:444";
   final Map<String, String> header = {
     "Content-Type": "application/json",
@@ -332,7 +332,6 @@ class stockService {
     } else {
       return null;
     }
-    return null;
   }
 
   Future<List<barcodeHistoryInfo>> getUserPushedBarcodeList(
@@ -370,7 +369,7 @@ class stockService {
     var json = jsonDecode(responsBody)["list"].cast<Map<String, dynamic>>();
 
     var list = json
-        .map<barcodeHistoryInfo>((json) => barcodeHistoryInfo.fromJson(json))
+        .map<barcodeInvoiceInfo>((json) => barcodeInvoiceInfo.fromJson(json))
         .toList();
 
     if (list.length == 0) {

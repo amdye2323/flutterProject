@@ -1,11 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_beep/flutter_beep.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:testflutter/DTO/barcodeCheckList.dart';
@@ -26,25 +26,40 @@ class _CheckInvoiceState extends State<CheckInvoice> {
   final _viewModel = HomeViewModel();
   Future<List<String>> barcodeCorList;
 
+  final Map<String, String> header = {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+  };
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // barcodeCorList = getResultCorcodeList();
   }
 
-  void addList() {
-    setState(() {});
+  Future<void> addList(String barcode) async {
+    setState(() {
+      _checkBarcodeList.add(barcode);
+    });
   }
 
   void deleteItemList(int index) {
-    _checkBarcodeList.removeAt(index);
-    setState(() {});
+    setState(() {
+      _checkBarcodeList.removeAt(index);
+    });
   }
 
   void reset() {
-    _checkBarcodeList.clear();
-    setState(() {});
+    setState(() {
+      _checkBarcodeList.clear();
+    });
+  }
+
+  void sendMessageInvoice() {
+    var userId = Provider.of<UserModel>(context, listen: false).userId;
+    var map = {'message': '송장 등록', 'userId': userId};
+    String body = jsonEncode(map);
+    // stompClient.send(destination: '/app/send', body: body, headers: header);
   }
 
   Future<List<barcodeCheckList>> getResultCorcodeList() async {
@@ -75,6 +90,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
                   } else if (snapshot.hasError) {
                     return Text("에러입니다.");
                   } else if (snapshot.hasData) {
+                    sendMessageInvoice();
                     return Flex(
                       direction: Axis.vertical,
                       children: <Widget>[
@@ -151,12 +167,10 @@ class _CheckInvoiceState extends State<CheckInvoice> {
               }
             });
             if (listCount == 0) {
-              _checkBarcodeList.add(_checkBarcode);
-              addList();
+              addList(_checkBarcode);
             }
           } else {
-            _checkBarcodeList.add(_checkBarcode);
-            addList();
+            addList(_checkBarcode);
           }
         }
       });
@@ -165,116 +179,162 @@ class _CheckInvoiceState extends State<CheckInvoice> {
     }
   }
 
+  SingleChildScrollView dataGrid(List<String> list) {
+    return SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columnSpacing: 20.0,
+            sortColumnIndex: 0,
+            columns: [
+              DataColumn(
+                  label: Text("결과"), numeric: false, tooltip: "craetDate"),
+            ],
+            rows: list
+                .map(
+                  (info) => DataRow(cells: <DataCell>[
+                    DataCell(
+                      Text(
+                        "${info}",
+                      ),
+                    ),
+                  ]),
+                )
+                .toList(),
+          ),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          body: Builder(builder: (BuildContext context) {
-            return Stack(
-              children: [
-                Container(
-                  width: double.infinity,
-                ),
-                Container(
+        body: Builder(builder: (BuildContext context) {
+          return Stack(
+            children: [
+              Container(
                   alignment: Alignment.center,
-                  height: double.infinity,
-                  child: Flex(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    direction: Axis.vertical,
-                    children: <Widget>[
-                      SizedBox(
-                        height: 60.0,
-                      ),
-                      Container(
-                        child: _checkBarcodeList.length == 0
-                            ? ElevatedButton(
-                                style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(
-                                  Color(0xFF527DAA),
-                                )),
-                                onPressed: () => startBarcodeScanStream(),
-                                child: Text(
-                                  '송장번호 체크',
-                                  style: TextStyle(color: Colors.white),
-                                ))
-                            : Flex(
-                                direction: Axis.vertical,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "송장 번호 리스트",
-                                    style: TextStyle(
-                                        color: Color(0xFF527DAA),
-                                        fontSize: 30.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    "현재 [${_checkBarcodeList.length}] 스캔",
-                                    style: TextStyle(
-                                        color: Color(0xFF527DAA),
-                                        fontSize: 30.0,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
-                              ),
-                      ),
-                      Expanded(
-                          child: Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2, childAspectRatio: 4.0),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              padding: EdgeInsets.all(5),
-                              child: GridTileBar(
-                                backgroundColor: Colors.lightBlue,
-                                leading: Icon(CupertinoIcons.barcode),
-                                title: Text(
-                                  "${_checkBarcodeList[index]}",
-                                  textAlign: TextAlign.center,
-                                ),
-                                trailing: IconButton(
-                                  onPressed: () => deleteItemList(index),
-                                  icon: Icon(CupertinoIcons.delete),
-                                ),
-                              ),
-                            );
-                          },
-                          itemCount: _checkBarcodeList.length,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Flex(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      direction: Axis.vertical,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 60.0,
                         ),
-                      )),
-                    ],
+                        Container(
+                          child: _checkBarcodeList.length == 0
+                              ? ElevatedButton(
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                    Color(0xFF527DAA),
+                                  )),
+                                  onPressed: () => startBarcodeScanStream(),
+                                  child: Text(
+                                    '송장번호 체크',
+                                    style: TextStyle(color: Colors.white),
+                                  ))
+                              : Flex(
+                                  direction: Axis.vertical,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "송장 번호 리스트",
+                                      style: TextStyle(
+                                          color: Color(0xFF527DAA),
+                                          fontSize: 30.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      "현재 [${_checkBarcodeList.length}] 스캔",
+                                      style: TextStyle(
+                                          color: Color(0xFF527DAA),
+                                          fontSize: 30.0,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
+                        ),
+                        Container(
+                            height: 500, child: dataGrid(_checkBarcodeList))
+                      ],
+                    ),
+                  )),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.white,
+                  onPressed: startBarcodeScanStream,
+                  child: Icon(
+                    CupertinoIcons.barcode,
+                    color: Color(0xFF527DAA),
                   ),
                 ),
-              ],
-            );
-          }),
-          floatingActionButton: SpeedDial(
-            backgroundColor: Color(0xFF527DAA),
-            icon: CupertinoIcons.circle_grid_3x3,
-            children: [
-              SpeedDialChild(
-                  backgroundColor: Color(0xFF527DAA),
-                  onTap: () {
-                    startBarcodeScanStream();
-                  },
-                  child: Icon(CupertinoIcons.camera)),
-              SpeedDialChild(
-                  backgroundColor: Color(0xFF527DAA),
-                  onTap: () {
+              ),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.white,
+                  onPressed: reset,
+                  child: Icon(
+                    CupertinoIcons.arrow_uturn_left,
+                    color: Color(0xFF527DAA),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  backgroundColor: Colors.white,
+                  onPressed: () {
                     FlutterDialog(context);
                   },
-                  child: Icon(CupertinoIcons.search)),
-              SpeedDialChild(
-                  backgroundColor: Color(0xFF527DAA),
-                  onTap: () {
-                    reset();
-                  },
-                  child: Icon(CupertinoIcons.trash)),
+                  child: Icon(
+                    CupertinoIcons.check_mark,
+                    color: Color(0xFF527DAA),
+                  ),
+                ),
+              ),
             ],
-          )),
+          );
+        }),
+        // floatingActionButton: SpeedDial(
+        //   backgroundColor: Color(0xFF527DAA),
+        //   icon: CupertinoIcons.circle_grid_3x3,
+        //   children: [
+        //     SpeedDialChild(
+        //         backgroundColor: Color(0xFF527DAA),
+        //         onTap: () {
+        //           startBarcodeScanStream();
+        //         },
+        //         child: Icon(
+        //           CupertinoIcons.camera,
+        //           color: Colors.white,
+        //         )),
+        //     SpeedDialChild(
+        //         backgroundColor: Color(0xFF527DAA),
+        //         onTap: () {
+        //           FlutterDialog(context);
+        //         },
+        //         child: Icon(
+        //           CupertinoIcons.search,
+        //           color: Colors.white,
+        //         )),
+        //     SpeedDialChild(
+        //         backgroundColor: Color(0xFF527DAA),
+        //         onTap: () {
+        //           reset();
+        //         },
+        //         child: Icon(
+        //           CupertinoIcons.trash,
+        //           color: Colors.white,
+        //         )),
+        //   ],
+        // )
+      ),
     );
   }
 }

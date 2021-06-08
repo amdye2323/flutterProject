@@ -33,7 +33,6 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
   void initState() {
     super.initState();
     corList = _viewModel.getCorCode();
-
     pickList = _viewModel.getCompanyPickingZoneInquiry(corCode);
   }
 
@@ -49,12 +48,16 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
         barcode, sku, qty, oriQty, userId);
     if (result == "success") {
       showToastInstance("성공적으로 등록되었습니다.");
-      zoneList = _viewModel.getSkuZoneList(sku);
-      pickList = _viewModel.getCompanyPickingZoneInquiry(corCode);
+      setState(() {
+        zoneList = _viewModel.getSkuZoneList(sku);
+        pickList = _viewModel.getCompanyPickingZoneInquiry(corCode);
+      });
     } else {
       showToastInstance("정보를 다시 확인해주세요.");
-      zoneList = _viewModel.getSkuZoneList(sku);
-      pickList = _viewModel.getCompanyPickingZoneInquiry(corCode);
+      setState(() {
+        zoneList = _viewModel.getSkuZoneList(sku);
+        pickList = _viewModel.getCompanyPickingZoneInquiry(corCode);
+      });
     }
   }
 
@@ -157,11 +160,11 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
             ),
             content: StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-                return Container(
-                  height: 300,
-                  width: 200,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
+                return SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Container(
+                    height: 350,
+                    width: 200,
                     child: Column(
                       children: [
                         FutureBuilder(
@@ -214,6 +217,7 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
                   onPressed: () {
                     revertPickZoneMaterial(
                         selectedTapBarcode, sku, qtyController.text, oriQty);
+                    selectedTapBarcode = "";
                   },
                   child: Text("되돌리기"))
             ],
@@ -227,14 +231,14 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
         body: Stack(
           children: [
             Container(
-              // height: double.infinity,
               width: double.infinity,
+              height: 200.0,
               color: Color(0xFF527DAA),
             ),
             Container(
               // height: double.infinity,
               alignment: Alignment.topCenter,
-              color: Color(0xFF527DAA),
+              color: Colors.white,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 physics: AlwaysScrollableScrollPhysics(),
@@ -292,9 +296,10 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
                                           itemCount: snapshot.data.length,
                                           itemBuilder: (BuildContext context,
                                               int index) {
-                                            return Padding(
+                                            return Container(
                                               padding: EdgeInsets.all(5.0),
                                               child: Card(
+                                                  child: Container(
                                                 child: ListTile(
                                                   onTap: () {
                                                     skuDialog(
@@ -309,7 +314,7 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
                                                   subtitle: Text(
                                                       "최근 업데이트 : ${snapshot.data[index].updateDate} / 개수 : ${snapshot.data[index].qty}"),
                                                 ),
-                                              ),
+                                              )),
                                             );
                                           }),
                                     ],

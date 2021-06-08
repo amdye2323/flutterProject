@@ -198,88 +198,88 @@ class _StockManageState extends State<StockManageFul> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        child: Stack(
-          children: <Widget>[
-            // backWallpaper(),
-            Container(
-              height: double.infinity,
-              alignment: Alignment.topCenter,
-              child: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                padding:
-                    EdgeInsets.symmetric(horizontal: 40.0, vertical: 120.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "PICKING LIST",
-                      style: TextStyle(
-                          color: Color(0xFF527DAA),
-                          fontFamily: 'OpenSans',
-                          fontSize: 40.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    datePicker(context),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    corCodeSelect(context),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    pickStep(context),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 0, horizontal: 50.0),
-                      child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              primary: Color(0xFF527DAA),
-                              onPrimary: Colors.white,
-                              elevation: 5),
-                          onPressed: () {
-                            pickVO pi = pickVO();
-                            pi.step = step;
-                            pi.corCode = corCode;
-                            pi.pickingDate =
-                                DateFormat('yyyy-MM-dd').format(currentTime);
-                            Provider.of<pickRequirement>(context, listen: false)
-                                .setPickRequirment(pi);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => pickListView()));
-                            // Navigator.popAndPushNamed(context, "pickListView");
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Icon(CupertinoIcons.arrow_right_circle),
-                              Text("조회하기")
-                            ],
-                          )),
-                    ),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                  ],
+        body: GestureDetector(
+          child: Stack(
+            children: <Widget>[
+              // backWallpaper(),
+              Container(
+                height: double.infinity,
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 40.0, vertical: 60.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "PICKING LIST",
+                        style: TextStyle(
+                            color: Color(0xFF527DAA),
+                            fontFamily: 'OpenSans',
+                            fontSize: 40.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      datePicker(context),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      corCodeSelect(context),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      pickStep(context),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 50.0),
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                primary: Color(0xFF527DAA),
+                                onPrimary: Colors.white,
+                                elevation: 5),
+                            onPressed: () {
+                              pickVO pi = pickVO();
+                              pi.step = step;
+                              pi.corCode = corCode;
+                              pi.pickingDate =
+                                  DateFormat('yyyy-MM-dd').format(currentTime);
+                              Provider.of<pickRequirement>(context,
+                                      listen: false)
+                                  .setPickRequirment(pi);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => pickListView()));
+                              // Navigator.popAndPushNamed(context, "pickListView");
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(CupertinoIcons.arrow_right_circle),
+                                Text("조회하기")
+                              ],
+                            )),
+                      ),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
-      ),
         floatingActionButton: FloatingActionButton(
           child: Icon(CupertinoIcons.return_icon),
           onPressed: () => Navigator.pop(context),
-        )
-    );
+        ));
   }
 }

@@ -53,14 +53,19 @@ class _barcodeHistoryViewState extends State<barcodeHistoryView> {
       children: <Widget>[
         Text(
           "조회 일자",
-          style: kLabelStyle,
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14.0,
+              fontFamily: 'OpenSans',
+              color: Colors.white),
           textAlign: TextAlign.center,
         ),
         SizedBox(
           height: 10.0,
         ),
         Container(
-          alignment: Alignment.centerLeft,
+          height: 35.0,
+          alignment: Alignment.center,
           decoration: kBoxDecorationStyle,
           child: TextButton(
             onPressed: () {
@@ -72,7 +77,7 @@ class _barcodeHistoryViewState extends State<barcodeHistoryView> {
                   color: Color(0xFF527DAA),
                   fontWeight: FontWeight.bold,
                   fontFamily: 'OpenSans',
-                  fontSize: 16.0),
+                  fontSize: 14.0),
             ),
           ),
         )
@@ -88,9 +93,11 @@ class _barcodeHistoryViewState extends State<barcodeHistoryView> {
           child: DataTable(
             columnSpacing: 20.0,
             sortColumnIndex: 0,
+            dataRowHeight: 30.0,
+            headingRowHeight: 35.0,
             columns: [
               DataColumn(
-                  label: Text("시간"), numeric: false, tooltip: "craetDate"),
+                  label: Text("시간"), numeric: false, tooltip: "createDate"),
               DataColumn(
                   label: Text("제품"), numeric: false, tooltip: "SKU LABEL"),
               DataColumn(
@@ -106,12 +113,12 @@ class _barcodeHistoryViewState extends State<barcodeHistoryView> {
             rows: list
                 .map(
                   (info) => DataRow(
-                      onSelectChanged: (value) {
-                        setState(() {
-                          selectedName = info.barcode + info.createDate;
-                        });
-                      },
-                      selected: selectedName == info.barcode + info.createDate,
+                      // onSelectChanged: (value) {
+                      //   setState(() {
+                      //     selectedName = info.barcode + info.createDate;
+                      //   });
+                      // },
+                      // selected: selectedName == info.barcode + info.createDate,
                       cells: <DataCell>[
                         DataCell(
                           Text(
@@ -149,12 +156,12 @@ class _barcodeHistoryViewState extends State<barcodeHistoryView> {
         body: Stack(
           children: [
             Container(
-              width: double.infinity,
-              color: Colors.black,
+              height: 200,
+              color: Color(0xFF527DAA),
             ),
             Container(
               alignment: Alignment.topCenter,
-              color: Colors.black,
+              // color: Color(0xFF527DAA),
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 physics: AlwaysScrollableScrollPhysics(),
@@ -163,33 +170,33 @@ class _barcodeHistoryViewState extends State<barcodeHistoryView> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      '피킹존리스트',
+                      '바코드이력조회',
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'OpenSans',
-                        fontSize: 40.0,
+                        fontSize: 25.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     SizedBox(
-                      height: 20.0,
+                      height: 15.0,
                     ),
                     datePicker(context),
                     SizedBox(
-                      height: 20.0,
+                      height: 15.0,
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 1.0),
                       child: Container(
-                        height: 500,
+                        height: 400,
                         decoration: BoxDecoration(
                           color: Colors.white,
+                          border: Border.all(color: Color(0xFF527DAA)),
                           borderRadius: BorderRadius.all(Radius.circular(5)),
                         ),
                         child: FutureBuilder(
                             future: historyList,
                             builder: (context, snapshot) {
-                              print(snapshot);
                               if (!snapshot.hasData) {
                                 return Align(
                                   alignment: Alignment.center,
@@ -229,4 +236,11 @@ final kBoxDecorationStyle = BoxDecoration(
     color: Color(0xFF527DAA),
   ),
   borderRadius: BorderRadius.circular(10.0),
+);
+
+final cColStyle = TextStyle(
+  color: Color(0xFF527DAA),
+  fontWeight: FontWeight.bold,
+  fontSize: 9.0,
+  fontFamily: 'OpenSans',
 );

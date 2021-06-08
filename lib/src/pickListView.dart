@@ -44,64 +44,69 @@ class _pickListViewState extends State<pickListView> {
     zoneList = _viewModel.getSkuZoneList(sku);
     showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "재고 위치",
-                  style: TextStyle(color: Color(0xFF527DAA), fontSize: 20.0),
-                )
-              ],
-            ),
-            content: Container(
-              height: 300,
-              width: 300,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    Text("${skuName}"),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    FutureBuilder(
-                        future: zoneList,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Text("데이터가 없습니다.");
-                          } else if (snapshot.hasError) {
-                            return Text("데이터가 없습니다.");
-                          } else if (snapshot.hasData) {
-                            return ListView.builder(
-                                itemCount: snapshot.data.length,
-                                shrinkWrap: true,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Card(
-                                    child: ListTile(
-                                      title: Text(
-                                          "${snapshot.data[index].storageZone}[${snapshot.data[index].qty} 개]"),
-                                      subtitle: Text(
-                                          "barcode : ${snapshot.data[index].storageZoneBarcode}"),
-                                    ),
-                                  );
-                                });
-                          } else {
-                            return CircularProgressIndicator();
-                          }
-                        })
-                  ],
-                ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
               ),
-            ),
-          );
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "재고 위치",
+                    style: TextStyle(color: Color(0xFF527DAA), fontSize: 20.0),
+                  )
+                ],
+              ),
+              content: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Container(
+                      height: 300,
+                      width: 300,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          Text("${skuName}"),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          FutureBuilder(
+                              future: zoneList,
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Text("데이터가 없습니다.");
+                                } else if (snapshot.hasError) {
+                                  return Text("데이터가 없습니다.");
+                                } else if (snapshot.hasData) {
+                                  return ListView.builder(
+                                      itemCount: snapshot.data.length,
+                                      shrinkWrap: true,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return Card(
+                                          child: ListTile(
+                                            title: Text(
+                                                "${snapshot.data[index].storageZone}[${snapshot.data[index].qty} 개]"),
+                                            subtitle: Text(
+                                                "barcode : ${snapshot.data[index].storageZoneBarcode}"),
+                                          ),
+                                        );
+                                      });
+                                } else {
+                                  return CircularProgressIndicator();
+                                }
+                              })
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ));
         });
   }
 

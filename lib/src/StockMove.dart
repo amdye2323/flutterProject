@@ -241,6 +241,7 @@ class _StockMoveState extends State<StockMove> {
                 height: 220,
                 decoration: BoxDecoration(
                     color: Colors.white,
+                    border: BoxDeco(),
                     borderRadius: BorderRadius.circular(10.0)),
                 child: Text(
                   _bottomMent,
@@ -254,6 +255,7 @@ class _StockMoveState extends State<StockMove> {
                 height: 220,
                 decoration: BoxDecoration(
                     color: Colors.white,
+                    border: BoxDeco(),
                     borderRadius: BorderRadius.circular(10.0)),
                 child: Text("에러입니다"),
               );
@@ -263,6 +265,7 @@ class _StockMoveState extends State<StockMove> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                     color: Colors.white,
+                    border: BoxDeco(),
                     borderRadius: BorderRadius.circular(10.0)),
                 child: SingleChildScrollView(
                   child: Flex(
@@ -316,10 +319,10 @@ class _StockMoveState extends State<StockMove> {
       body: Builder(builder: (BuildContext context) {
         return Stack(
           children: <Widget>[
-            Container(
-              color: Color(0xFF527DAA),
-              // color: Colors.black12,
-            ),
+            // Container(
+            //   color: Color(0xFF527DAA),
+            //   // color: Colors.black12,
+            // ),
             Container(
                 padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
                 height: double.infinity,
@@ -354,7 +357,12 @@ class _StockMoveState extends State<StockMove> {
                                 builder: (context, snapshot) {
                                   if (!snapshot.hasData) {
                                     return Container(
-                                        height: 250,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                            border: BoxDeco(),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0)),
+                                        height: 220,
                                         child: IconButton(
                                           color: Color(0xFF527DAA),
                                           icon: Icon(
@@ -365,6 +373,11 @@ class _StockMoveState extends State<StockMove> {
                                   } else if (snapshot.hasError) {
                                     return Container(
                                       height: 220,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                          border: BoxDeco(),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0)),
                                       child: Text("에러입니다."),
                                     );
                                   } else if (snapshot.hasData) {
@@ -372,6 +385,11 @@ class _StockMoveState extends State<StockMove> {
                                     skuCode = snapshot.data[0].sku;
                                     return Container(
                                         height: 220,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                            border: BoxDeco(),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0)),
                                         child: SingleChildScrollView(
                                           child: Flex(
                                             mainAxisAlignment:
@@ -405,10 +423,6 @@ class _StockMoveState extends State<StockMove> {
                             ],
                           ),
                         ),
-
-                        // Icon(CupertinoIcons.arrowtriangle_down_fill,
-                        //     size: 40, color: Colors.white),
-                        // normalTitle("대상 구역"),
                         SizedBox(
                           height: 15,
                         ),
