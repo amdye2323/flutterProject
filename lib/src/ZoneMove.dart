@@ -129,6 +129,7 @@ class _ZoneMoveState extends State<ZoneMove> {
         } else {
           showToastInstance("정보를 다시 한번 확인해주세요");
         }
+        MainFulPageState.of(context).sendMessage("구역 지정하여 재고를 이동하였습니다.");
         return;
       case "거래선출고":
         httpResult = await _viewModel.stockMoveToCompany(
@@ -141,6 +142,7 @@ class _ZoneMoveState extends State<ZoneMove> {
         setState(() {
           skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
         });
+        MainFulPageState.of(context).sendMessage("거래선 출고를 등록하였습니다.");
         return;
       case "피킹구역":
         httpResult = await _viewModel.stockMoveToPickingZone(
@@ -153,6 +155,7 @@ class _ZoneMoveState extends State<ZoneMove> {
         setState(() {
           skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
         });
+        MainFulPageState.of(context).sendMessage("피킹 구역에 재고를 등록하였습니다.");
         return;
       case "분할등록":
         httpResult = await _viewModel.stockMoveDivision(
@@ -163,8 +166,9 @@ class _ZoneMoveState extends State<ZoneMove> {
           showToastInstance("정보를 다시 한번 확인해주세요");
         }
         setState(() {
-          skuDetail = _viewModel.skuDetail(_zoneBarcode);
+          skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
         });
+        MainFulPageState.of(context).sendMessage("재고를 분할하여 등록했습니다.");
         return;
     }
   }
@@ -229,7 +233,12 @@ class _ZoneMoveState extends State<ZoneMove> {
                     stockMoveToZone(qtyController.text);
                     Navigator.pop(context);
                   },
-                  child: Text("수정하기"))
+                  child: Text("수정하기")),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("닫기")),
             ],
           );
         });

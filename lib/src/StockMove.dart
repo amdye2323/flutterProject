@@ -13,13 +13,6 @@ import '../Home/HomeViewModel.dart';
 import '../main.dart';
 import 'MainPage.dart';
 
-class StockMove extends StatefulWidget {
-  const StockMove({Key key}) : super(key: key);
-
-  @override
-  _StockMoveState createState() => _StockMoveState();
-}
-
 class _StockMoveState extends State<StockMove> {
   //재고 바코드
   String _scanBarcode = "default";
@@ -89,6 +82,7 @@ class _StockMoveState extends State<StockMove> {
         } else {
           showToastInstance("정보를 다시 한번 확인해주세요");
         }
+        MainFulPageState.of(context).sendMessage("구역을 지정하였습니다.");
         return;
       case "거래선출고":
         httpResult = await _viewModel.stockMoveToCompany(
@@ -101,6 +95,7 @@ class _StockMoveState extends State<StockMove> {
         setState(() {
           skuDetail = _viewModel.skuDetail(_scanBarcode);
         });
+        MainFulPageState.of(context).sendMessage("거래선 출고를 등록하였습니다.");
         return;
       case "피킹구역":
         httpResult = await _viewModel.stockMoveToPickingZone(
@@ -113,6 +108,7 @@ class _StockMoveState extends State<StockMove> {
         setState(() {
           skuDetail = _viewModel.skuDetail(_scanBarcode);
         });
+        MainFulPageState.of(context).sendMessage("피킹존에 재고를 등록했습니다.");
         return;
       case "분할등록":
         httpResult = await _viewModel.stockMoveDivision(
@@ -125,6 +121,7 @@ class _StockMoveState extends State<StockMove> {
         setState(() {
           skuDetail = _viewModel.skuDetail(_scanBarcode);
         });
+        MainFulPageState.of(context).sendMessage("재고를 분할하여 등록하였습니다.");
         return;
     }
   }
@@ -319,10 +316,11 @@ class _StockMoveState extends State<StockMove> {
       body: Builder(builder: (BuildContext context) {
         return Stack(
           children: <Widget>[
-            // Container(
-            //   color: Color(0xFF527DAA),
-            //   // color: Colors.black12,
-            // ),
+            Container(
+              color: Colors.white,
+              height: 200,
+              // color: Colors.black12,
+            ),
             Container(
                 padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 20.0),
                 height: double.infinity,
@@ -412,6 +410,13 @@ class _StockMoveState extends State<StockMove> {
                                               normalCard(
                                                   "보관 장소 : ${snapshot.data[0].storageZone}",
                                                   CupertinoIcons.eye_fill),
+                                              // Positioned(
+                                              //     right: 90,
+                                              //     bottom: 90,
+                                              //     child: Icon(
+                                              //       CupertinoIcons.barcode,
+                                              //       color: Colors.black87,
+                                              //     ))
                                             ],
                                           ),
                                         ));
@@ -500,4 +505,11 @@ class _StockMoveState extends State<StockMove> {
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
+}
+
+class StockMove extends StatefulWidget {
+  const StockMove({Key key}) : super(key: key);
+
+  @override
+  _StockMoveState createState() => _StockMoveState();
 }

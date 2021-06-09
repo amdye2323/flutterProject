@@ -12,6 +12,7 @@ import 'package:testflutter/DTO/barcodeCheckList.dart';
 import 'package:testflutter/Home/HomeViewModel.dart';
 
 import '../main.dart';
+import 'MainPage.dart';
 
 class CheckInvoice extends StatefulWidget {
   const CheckInvoice({Key key}) : super(key: key);
@@ -135,7 +136,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text("확인"))
+                  child: Text("확인")),
             ],
           );
         });
@@ -189,7 +190,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
             sortColumnIndex: 0,
             columns: [
               DataColumn(
-                  label: Text("결과"), numeric: false, tooltip: "craetDate"),
+                  label: Text("결과"), numeric: false, tooltip: "createDate"),
             ],
             rows: list
                 .map(
@@ -254,7 +255,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
                                           color: Color(0xFF527DAA),
                                           fontSize: 30.0,
                                           fontWeight: FontWeight.bold),
-                                    )
+                                    ),
                                   ],
                                 ),
                         ),
@@ -290,6 +291,7 @@ class _CheckInvoiceState extends State<CheckInvoice> {
                 child: FloatingActionButton(
                   backgroundColor: Colors.white,
                   onPressed: () {
+                    MainFulPageState.of(context).sendMessage("송장이 등록되었습니다.");
                     FlutterDialog(context);
                   },
                   child: Icon(
@@ -301,39 +303,6 @@ class _CheckInvoiceState extends State<CheckInvoice> {
             ],
           );
         }),
-        // floatingActionButton: SpeedDial(
-        //   backgroundColor: Color(0xFF527DAA),
-        //   icon: CupertinoIcons.circle_grid_3x3,
-        //   children: [
-        //     SpeedDialChild(
-        //         backgroundColor: Color(0xFF527DAA),
-        //         onTap: () {
-        //           startBarcodeScanStream();
-        //         },
-        //         child: Icon(
-        //           CupertinoIcons.camera,
-        //           color: Colors.white,
-        //         )),
-        //     SpeedDialChild(
-        //         backgroundColor: Color(0xFF527DAA),
-        //         onTap: () {
-        //           FlutterDialog(context);
-        //         },
-        //         child: Icon(
-        //           CupertinoIcons.search,
-        //           color: Colors.white,
-        //         )),
-        //     SpeedDialChild(
-        //         backgroundColor: Color(0xFF527DAA),
-        //         onTap: () {
-        //           reset();
-        //         },
-        //         child: Icon(
-        //           CupertinoIcons.trash,
-        //           color: Colors.white,
-        //         )),
-        //   ],
-        // )
       ),
     );
   }

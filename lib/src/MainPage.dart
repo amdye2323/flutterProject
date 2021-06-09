@@ -17,7 +17,6 @@ import '../main.dart';
 
 class MainPage extends StatelessWidget {
   // const MainPage({Key key}) : super(key: key);
-  // final channel = IOWebSocketChannel.connect("ws://echo.websocket.org");
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -28,20 +27,23 @@ class MainPage extends StatelessWidget {
 
 class MainFulPage extends StatefulWidget {
   // const MainFulPage({Key key}) : super(key: key);
-
   @override
-  _MainFulPageState createState() => _MainFulPageState();
+  State<MainFulPage> createState() => MainFulPageState();
 }
 
-class _MainFulPageState extends State<MainFulPage> {
+class MainFulPageState extends State<MainFulPage> {
   final socketUrl = "http://172.30.1.1:8072/ws-message";
+  bool alertName = true;
   StompClient stompClient;
   final Map<String, String> header = {
     "Content-Type": "application/json",
     "Accept": "application/json"
   };
+  static MainFulPageState of(BuildContext context) =>
+      context.findRootAncestorStateOfType<MainFulPageState>();
 
-  List<Map<String, dynamic>> noticeList;
+  List<Map<String, dynamic>> noticeList =
+      List<Map<String, dynamic>>.empty(growable: true);
 
   void onConnect(StompFrame frame) {
     stompClient.subscribe(
@@ -49,17 +51,20 @@ class _MainFulPageState extends State<MainFulPage> {
         callback: (StompFrame frame) {
           if (frame.body != null) {
             Map<String, dynamic> result = json.decode(frame.body);
-            // noticeList.add(
-            //     {"message": result["message"], "userId": result["userId"]});
-            // noticeList.forEach((element) {
-            //   print(element);
-            // });
+            Map<String, dynamic> map = {
+              "message": result["message"],
+              "userId": result["userId"]
+            };
+            setState(() {
+              noticeList.add(map);
+            });
           }
         });
   }
 
-  void sendMessage() {
-    var map = {'message': 'hello', 'userId': 'userId'};
+  void sendMessage(String msg) {
+    var userId = Provider.of<UserModel>(context, listen: false).userId;
+    var map = {'message': msg, 'userId': userId};
     String body = jsonEncode(map);
     stompClient.send(destination: '/app/send', body: body, headers: header);
   }
@@ -158,71 +163,130 @@ class _MainFulPageState extends State<MainFulPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: WillPopScope(
-          onWillPop: () {
-            return Future(() => false);
-          },
-          child: Scaffold(
-              appBar: AppBar(
-                backgroundColor: Colors.black87,
-                title: Text('GOLINK'),
-                actions: <Widget>[
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
-                    child: IconButton(
-                      onPressed: () {
-                        sendMessage();
-                      },
-                      icon: const Icon(Icons.add_alert),
-                      tooltip: 'Notice User Info',
-                    ),
+    return Stack(
+      children: [
+        DefaultTabController(
+          length: 4,
+          child: WillPopScope(
+              onWillPop: () {
+                return Future(() => false);
+              },
+              child: Scaffold(
+                  appBar: AppBar(
+                    backgroundColor: Colors.black87,
+                    title: Text('GOLINK'),
+                    actions: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 0.0),
+                        child: Row(children: [
+                          IconButton(
+                            onPressed: () {
+                              // sendMessage("login");
+                              if (alertName == false) {
+                                setState(() {
+                                  alertName = true;
+                                });
+                              } else {
+                                setState(() {
+                                  alertName = false;
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.add_alert),
+                            tooltip: 'Notice User Info',
+                          ),
+                          Text("[${noticeList.length}]")
+                        ]),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 0.0),
+                        child: IconButton(
+                          icon: const Icon(CupertinoIcons.clear),
+                          onPressed: () {
+                            logOutDialog(context);
+                          },
+                        ),
+                      )
+                    ],
                   ),
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
-                    child: IconButton(
-                      icon: const Icon(CupertinoIcons.clear),
-                      onPressed: () {
-                        logOutDialog(context);
-                      },
-                    ),
-                  )
-                ],
-              ),
-              body: Center(
-                child: _widgetOptions.elementAt(screenIndex),
-              ),
-              bottomNavigationBar: BottomNavigationBar(
-                backgroundColor: Colors.black,
-                items: const <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.home),
-                    label: '홈',
+                  body: Center(
+                    child: _widgetOptions.elementAt(screenIndex),
+                  ),
+                  bottomNavigationBar: BottomNavigationBar(
                     backgroundColor: Colors.black,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.barcode_viewfinder),
-                    label: '재고스캔',
-                    backgroundColor: Colors.black,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.arrow_up_arrow_down_circle_fill),
-                    label: '구역스캔',
-                    backgroundColor: Colors.black,
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(CupertinoIcons.doc_person_fill),
-                    label: '송장체크',
-                    backgroundColor: Colors.black,
-                  ),
-                ],
-                onTap: _onItemTapped,
-                selectedItemColor: Colors.blue,
-                currentIndex: screenIndex,
-              ))),
+                    items: const <BottomNavigationBarItem>[
+                      BottomNavigationBarItem(
+                        icon: Icon(CupertinoIcons.home),
+                        label: '홈',
+                        backgroundColor: Colors.black,
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(CupertinoIcons.barcode_viewfinder),
+                        label: '재고스캔',
+                        backgroundColor: Colors.black,
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(
+                            CupertinoIcons.arrow_up_arrow_down_circle_fill),
+                        label: '구역스캔',
+                        backgroundColor: Colors.black,
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(CupertinoIcons.doc_person_fill),
+                        label: '송장체크',
+                        backgroundColor: Colors.black,
+                      ),
+                    ],
+                    onTap: _onItemTapped,
+                    selectedItemColor: Colors.blue,
+                    currentIndex: screenIndex,
+                  ))),
+        ),
+        alertName == false
+            ? Positioned(
+                right: 10,
+                top: 80,
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Container(
+                      color: Colors.white30,
+                      height: 600,
+                      width: 300,
+                      child: ListView.builder(
+                        itemCount: noticeList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Card(
+                              child: Container(
+                            decoration: BoxDecoration(
+                                border: Border(
+                              // left: BorderSide(
+                              //     width: 2, color: Colors.blueAccent),
+                              top: BorderSide(
+                                  width: 7, color: Color(0xFF527DAA)),
+                            )),
+                            child: ListTile(
+                              tileColor: Colors.white24,
+                              onTap: () {
+                                setState(() {
+                                  noticeList.removeAt(index);
+                                });
+                              },
+                              title: Text(
+                                "${noticeList[index]['message']}",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              subtitle:
+                                  Text("아이디 : ${noticeList[index]['userId']}"),
+                            ),
+                          ));
+                        },
+                        shrinkWrap: true,
+                      ),
+                    )))
+            : Text(""),
+      ],
     );
   }
 }

@@ -219,7 +219,12 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
                         selectedTapBarcode, sku, qtyController.text, oriQty);
                     selectedTapBarcode = "";
                   },
-                  child: Text("되돌리기"))
+                  child: Text("실행")),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("닫기"))
             ],
           );
         });
@@ -231,14 +236,12 @@ class _pickZoneManageFulState extends State<pickZoneManageFul> {
         body: Stack(
           children: [
             Container(
-              width: double.infinity,
               height: 200.0,
               color: Color(0xFF527DAA),
             ),
             Container(
               // height: double.infinity,
               alignment: Alignment.topCenter,
-              color: Colors.white,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 physics: AlwaysScrollableScrollPhysics(),

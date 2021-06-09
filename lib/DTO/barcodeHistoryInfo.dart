@@ -7,6 +7,7 @@ class barcodeHistoryInfo {
   String qty;
   String ioGubun;
   String storageZone;
+  String remark;
   String createDate;
 
   barcodeHistoryInfo(
@@ -18,6 +19,7 @@ class barcodeHistoryInfo {
       this.qty,
       this.ioGubun,
       this.storageZone,
+      this.remark,
       this.createDate});
 
   factory barcodeHistoryInfo.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class barcodeHistoryInfo {
       qty: json["qty"] as String,
       ioGubun: json["ioGubun"] as String,
       storageZone: json["storageZone"] as String,
+      remark: json["remark"] as String,
       createDate: json["createDate"] as String,
     );
   }
