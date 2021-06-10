@@ -410,13 +410,6 @@ class _StockMoveState extends State<StockMove> {
                                               normalCard(
                                                   "보관 장소 : ${snapshot.data[0].storageZone}",
                                                   CupertinoIcons.eye_fill),
-                                              // Positioned(
-                                              //     right: 90,
-                                              //     bottom: 90,
-                                              //     child: Icon(
-                                              //       CupertinoIcons.barcode,
-                                              //       color: Colors.black87,
-                                              //     ))
                                             ],
                                           ),
                                         ));

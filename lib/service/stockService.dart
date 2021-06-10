@@ -14,8 +14,9 @@ import 'package:testflutter/DTO/skuZoneList.dart';
 import '../DTO/skuInfo.dart';
 
 class stockService {
-  final String baseUrl = "http://172.30.1.1:8072";
-  // final String baseUrl = "https://alpha.golink.co.kr:444";
+  // final String baseUrl = "http://172.30.1.1:8072";
+  // final String baseUrl = "http://192.168.0.10:8072";
+  final String baseUrl = "https://alpha.golink.co.kr:444";
   final Map<String, String> header = {
     "Content-Type": "application/json",
     "Accept": "application/json"

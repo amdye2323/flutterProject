@@ -97,12 +97,33 @@ class _ZoneMoveState extends State<ZoneMove> {
     if (!mounted) return;
   }
 
+  Future<void> meterialScan() async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', false, ScanMode.BARCODE);
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform version.';
+    }
+
+    if (barcodeScanRes.length == 10) {
+      setState(() {
+        _zoneScanBarcode = barcodeScanRes;
+        skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
+      });
+    } else {
+      showToastInstance("바코드를 확안해주세요.");
+    }
+    if (!mounted) return;
+  }
+
   void onActionSelected(String key) {
     setState(() {
       _firstRadio = key;
       switch (key) {
         case "구역지정":
-          _bottomMent = "여기를 눌러 스캔해주세요.";
+          _bottomMent = "스캔버튼을 눌러주세요.";
           return;
         case "거래선출고":
           _bottomMent = "거래선 선택 이후 체크해주세요";
@@ -461,6 +482,19 @@ class _ZoneMoveState extends State<ZoneMove> {
                         ],
                       ),
                     ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     IconButton(
+                    //         onPressed: (){},
+                    //         icon: Icon(CupertinoIcons.barcode)
+                    //     ),
+                    //     Positioned(child:                         IconButton(
+                    //         onPressed: (){},
+                    //         icon: Icon(CupertinoIcons.barcode)
+                    //     ),)
+                    //   ],
+                    // ),
                     SizedBox(
                       height: 15.0,
                     ),
@@ -513,6 +547,17 @@ class _ZoneMoveState extends State<ZoneMove> {
               child: FloatingActionButton(
                 backgroundColor: Colors.white,
                 onPressed: pageReset,
+                child: Icon(
+                  CupertinoIcons.arrow_uturn_left,
+                  color: Color(0xFF527DAA),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: FloatingActionButton(
+                backgroundColor: Colors.white,
+                onPressed: meterialScan,
                 child: Icon(
                   CupertinoIcons.arrow_uturn_left,
                   color: Color(0xFF527DAA),

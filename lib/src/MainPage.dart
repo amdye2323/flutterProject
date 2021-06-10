@@ -32,7 +32,8 @@ class MainFulPage extends StatefulWidget {
 }
 
 class MainFulPageState extends State<MainFulPage> {
-  final socketUrl = "http://172.30.1.1:8072/ws-message";
+  // final socketUrl = "http://172.30.1.1:8072/ws-message";
+  final socketUrl = "https://alpha.golink.co.kr:444/ws-message";
   bool alertName = true;
   StompClient stompClient;
   final Map<String, String> header = {
