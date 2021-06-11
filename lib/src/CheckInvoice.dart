@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_beep/flutter_beep.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:testflutter/DTO/barcodeCheckList.dart';
 import 'package:testflutter/Home/HomeViewModel.dart';
@@ -150,15 +149,6 @@ class _CheckInvoiceState extends State<CheckInvoice> {
           .listen((barcode) {
         int barcodeSize = barcode.toString().length;
         if (_checkBarcode != barcode && barcodeSize == 23) {
-          FlutterBeep.beep();
-          Fluttertoast.showToast(
-              msg: "${barcode}가 등록되었습니다.",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.white60,
-              textColor: Colors.black,
-              fontSize: 16);
           _checkBarcode = barcode;
           int listCount = 0;
           if (_checkBarcodeList != null) {
@@ -169,9 +159,12 @@ class _CheckInvoiceState extends State<CheckInvoice> {
             });
             if (listCount == 0) {
               addList(_checkBarcode);
+              FlutterBeep.beep();
+              showToastInstance("${barcode}가 등록되었습니다.");
+            } else {
+              FlutterBeep.playSysSound(32);
+              showToastInstance("중복된 바코드입니다.");
             }
-          } else {
-            addList(_checkBarcode);
           }
         }
       });

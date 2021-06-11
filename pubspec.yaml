@@ -45,6 +45,7 @@ dependencies:
   flutter_secure_storage: ^4.2.0
   cupertino_radio_choice: ^1.0.1+1
   stomp_dart_client: ^0.4.2
+  confirm_dialog: ^1.0.0
 
 
 dev_dependencies:

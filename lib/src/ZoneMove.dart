@@ -33,6 +33,7 @@ class _ZoneMoveState extends State<ZoneMove> {
   String _bottomMent = "여기를 눌러 스캔해주세요.";
   String selectTapBarcode = "";
   String sku = "";
+  List skuViewList = [];
 
   final qtyController = TextEditingController();
 
@@ -76,13 +77,13 @@ class _ZoneMoveState extends State<ZoneMove> {
       barcodeScanRes = 'Failed to get platform version.';
     }
 
-    if (barcodeScanRes.length == 10 && _scanCheck == false) {
+    if (barcodeScanRes.length == 5 && _scanCheck == false) {
       setState(() {
         _zoneScanBarcode = barcodeScanRes;
         skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
         _scanCheck = true;
       });
-    } else if (barcodeScanRes.length == 10 && _scanCheck == true) {
+    } else if (barcodeScanRes.length == 5 && _scanCheck == true) {
       if (_zoneScanBarcode == barcodeScanRes) {
         showToastInstance("같은 구역을 설정하셨습니다.");
       } else {
@@ -107,7 +108,7 @@ class _ZoneMoveState extends State<ZoneMove> {
       barcodeScanRes = 'Failed to get platform version.';
     }
 
-    if (barcodeScanRes.length == 10) {
+    if (barcodeScanRes.length == 5) {
       setState(() {
         _zoneScanBarcode = barcodeScanRes;
         skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
@@ -146,6 +147,7 @@ class _ZoneMoveState extends State<ZoneMove> {
           showToastInstance("성공적으로 등록되었습니다.");
           setState(() {
             skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
+            barZone = _viewModel.getBarcodeZone(_zoneBarcode);
           });
         } else {
           showToastInstance("정보를 다시 한번 확인해주세요");
@@ -162,6 +164,7 @@ class _ZoneMoveState extends State<ZoneMove> {
         }
         setState(() {
           skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
+          barZone = _viewModel.getBarcodeZone(_zoneBarcode);
         });
         MainFulPageState.of(context).sendMessage("거래선 출고를 등록하였습니다.");
         return;
@@ -175,6 +178,7 @@ class _ZoneMoveState extends State<ZoneMove> {
         }
         setState(() {
           skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
+          barZone = _viewModel.getBarcodeZone(_zoneBarcode);
         });
         MainFulPageState.of(context).sendMessage("피킹 구역에 재고를 등록하였습니다.");
         return;
@@ -188,6 +192,7 @@ class _ZoneMoveState extends State<ZoneMove> {
         }
         setState(() {
           skuDetail = _viewModel.barcodeSkuList(_zoneScanBarcode);
+          barZone = _viewModel.getBarcodeZone(_zoneBarcode);
         });
         MainFulPageState.of(context).sendMessage("재고를 분할하여 등록했습니다.");
         return;
@@ -300,6 +305,7 @@ class _ZoneMoveState extends State<ZoneMove> {
                 child: Text("에러입니다"),
               );
             } else if (snapshot.hasData) {
+              skuViewList = snapshot.data.skuList;
               return Container(
                   height: 220,
                   width: double.infinity,
@@ -482,19 +488,6 @@ class _ZoneMoveState extends State<ZoneMove> {
                         ],
                       ),
                     ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     IconButton(
-                    //         onPressed: (){},
-                    //         icon: Icon(CupertinoIcons.barcode)
-                    //     ),
-                    //     Positioned(child:                         IconButton(
-                    //         onPressed: (){},
-                    //         icon: Icon(CupertinoIcons.barcode)
-                    //     ),)
-                    //   ],
-                    // ),
                     SizedBox(
                       height: 15.0,
                     ),

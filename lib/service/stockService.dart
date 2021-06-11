@@ -14,9 +14,9 @@ import 'package:testflutter/DTO/skuZoneList.dart';
 import '../DTO/skuInfo.dart';
 
 class stockService {
-  // final String baseUrl = "http://172.30.1.1:8072";
+  final String baseUrl = "http://172.30.1.1:8072";
   // final String baseUrl = "http://192.168.0.10:8072";
-  final String baseUrl = "https://alpha.golink.co.kr:444";
+  // final String baseUrl = "https://alpha.golink.co.kr:444";
   final Map<String, String> header = {
     "Content-Type": "application/json",
     "Accept": "application/json"
@@ -150,11 +150,16 @@ class stockService {
     String responsBody = utf8.decode(response.bodyBytes);
     var json = jsonDecode(responsBody);
     var jsonList = jsonDecode(responsBody)["list"];
+    var skuList = jsonDecode(responsBody)["skuList"];
 
     BarcodeZone zone = BarcodeZone();
     zone.storageZone = jsonList["storageZone"];
     zone.statusZone = jsonList["statusZone"];
     zone.storageZoneBarcode = jsonList["storageZoneBarcode"];
+    if (skuList.length != 0) {
+      zone.skuList = (skuList as List<dynamic>).cast<String>();
+      print(skuList.toString());
+    }
 
     if (json["result"] != "success") {
       return Future.error("error");
@@ -243,7 +248,6 @@ class stockService {
 
     String responsBody = utf8.decode(response.bodyBytes);
     var json = jsonDecode(responsBody);
-    print(json);
     if (json["result"].toString() == "success") {
       return "success";
     } else {
@@ -358,12 +362,12 @@ class stockService {
   }
 
   Future<List<barcodeInvoiceInfo>> getUserPushedInvoiceList(
-      String userId, String searchDate) async {
+      String userId, String searchDate, String corCode) async {
     if (searchDate == "") {
       return null;
     }
     String url =
-        "${baseUrl}/api/getUserPushedInvoiceList?date=${searchDate}&userId=${userId}";
+        "${baseUrl}/api/getUserPushedInvoiceList?date=${searchDate}&userId=${userId}&corCode=${corCode}";
     var response = await http.get(url, headers: header);
     String responsBody = utf8.decode(response.bodyBytes);
 

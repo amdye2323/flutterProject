@@ -86,7 +86,7 @@ class HomeViewModel {
   }
 
   Future<List<barcodeInvoiceInfo>> getUserPushedInvoiceList(
-      String userId, String searchDate) async {
-    return await _service.getUserPushedInvoiceList(userId, searchDate);
+      String userId, String searchDate, String corCode) async {
+    return await _service.getUserPushedInvoiceList(userId, searchDate, corCode);
   }
 }
