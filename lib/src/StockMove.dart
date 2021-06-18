@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:testflutter/DTO/BarcodeZone.dart';
+import 'package:testflutter/src/Button/Align.dart';
 
 import '../DTO/skuInfo.dart';
 import '../Home/HomeViewModel.dart';
@@ -453,28 +454,32 @@ class _StockMoveState extends State<StockMove> {
                         ),
                       ]),
                 )),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: FloatingActionButton(
-                backgroundColor: Colors.white,
-                onPressed: scanBarcodeNormal,
-                child: Icon(
-                  CupertinoIcons.barcode,
-                  color: Color(0xFF527DAA),
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: FloatingActionButton(
-                backgroundColor: Colors.white,
-                onPressed: pageReset,
-                child: Icon(
-                  CupertinoIcons.arrow_uturn_left,
-                  color: Color(0xFF527DAA),
-                ),
-              ),
-            ),
+            leftAlign(scanBarcodeNormal, CupertinoIcons.barcode,
+                Alignment.bottomCenter),
+            // Align(
+            //   alignment: Alignment.bottomCenter,
+            //   child: FloatingActionButton(
+            //     backgroundColor: Colors.white,
+            //     onPressed: scanBarcodeNormal,
+            //     child: Icon(
+            //       CupertinoIcons.barcode,
+            //       color: Color(0xFF527DAA),
+            //     ),
+            //   ),
+            // ),
+            leftAlign(pageReset, CupertinoIcons.arrow_uturn_left,
+                Alignment.bottomLeft),
+            // Align(
+            //   alignment: Alignment.bottomLeft,
+            //   child: FloatingActionButton(
+            //     backgroundColor: Colors.white,
+            //     onPressed: pageReset,
+            //     child: Icon(
+            //       CupertinoIcons.arrow_uturn_left,
+            //       color: Color(0xFF527DAA),
+            //     ),
+            //   ),
+            // ),
             Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(

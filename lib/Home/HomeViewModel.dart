@@ -5,6 +5,7 @@ import 'package:testflutter/DTO/barcodeCheckList.dart';
 import 'package:testflutter/DTO/barcodeHistoryInfo.dart';
 import 'package:testflutter/DTO/barcodeInvoiceInfo.dart';
 import 'package:testflutter/DTO/pickZoneInfo.dart';
+import 'package:testflutter/DTO/receivingItem.dart';
 import 'package:testflutter/DTO/skuZoneList.dart';
 
 import '../DTO/skuInfo.dart';
@@ -88,5 +89,22 @@ class HomeViewModel {
   Future<List<barcodeInvoiceInfo>> getUserPushedInvoiceList(
       String userId, String searchDate, String corCode) async {
     return await _service.getUserPushedInvoiceList(userId, searchDate, corCode);
+  }
+
+  Future<List<receivingItem>> getReceivingItemList(
+      String userId, String scanBarcode) async {
+    return await _service.getReceivingItemList(userId, scanBarcode);
+  }
+
+  Future<List<Map<String, String>>> getPalletBarcodeList() async {
+    return await _service.getPalletBarcodeList();
+  }
+
+  Future<List<String>> getPalletList() async {
+    return await _service.getPalletList();
+  }
+
+  Future<List<String>> getZoneList() async {
+    return await _service.getZoneList();
   }
 }

@@ -14,6 +14,7 @@ import 'package:testflutter/src/StockMove.dart';
 import 'package:testflutter/src/ZoneMove.dart';
 
 import '../main.dart';
+import 'ReceivingCertificate.dart';
 
 class MainPage extends StatelessWidget {
   // const MainPage({Key key}) : super(key: key);
@@ -36,6 +37,7 @@ class MainFulPageState extends State<MainFulPage> {
   // final socketUrl = "https://alpha.golink.co.kr:444/ws-message";
   bool alertName = true;
   StompClient stompClient;
+
   final Map<String, String> header = {
     "Content-Type": "application/json",
     "Accept": "application/json"
@@ -85,6 +87,7 @@ class MainFulPageState extends State<MainFulPage> {
     MainPageWidget(),
     StockMove(),
     ZoneMove(),
+    ReceivingCertificate(),
     CheckInvoice(),
   ];
 
@@ -232,6 +235,11 @@ class MainFulPageState extends State<MainFulPage> {
                         icon: Icon(
                             CupertinoIcons.arrow_up_arrow_down_circle_fill),
                         label: '구역스캔',
+                        backgroundColor: Colors.black,
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(CupertinoIcons.briefcase_fill),
+                        label: '입고증',
                         backgroundColor: Colors.black,
                       ),
                       BottomNavigationBarItem(

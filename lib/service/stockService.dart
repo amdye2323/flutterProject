@@ -9,6 +9,7 @@ import 'package:testflutter/DTO/barcodeHistoryInfo.dart';
 import 'package:testflutter/DTO/barcodeInvoiceInfo.dart';
 import 'package:testflutter/DTO/corCode.dart';
 import 'package:testflutter/DTO/pickZoneInfo.dart';
+import 'package:testflutter/DTO/receivingItem.dart';
 import 'package:testflutter/DTO/skuZoneList.dart';
 
 import '../DTO/skuInfo.dart';
@@ -20,6 +21,10 @@ class stockService {
   final Map<String, String> header = {
     "Content-Type": "application/json",
     "Accept": "application/json"
+  };
+  final Map<String, String> postHeader = {
+    "Accept": "application/json",
+    "Content-Type": "application/x-www-form-urlencoded"
   };
 
   /**
@@ -379,6 +384,95 @@ class stockService {
 
     if (list.length == 0) {
       return null;
+    }
+    return list;
+  }
+
+  /**
+   * 입고증 리스트를 호출한다.
+   */
+  Future<List<receivingItem>> getReceivingItemList(
+      String userId, String scanBarcode) async {
+    if (scanBarcode == "") {
+      return null;
+    }
+    // var body = jsonEncode({
+    //   "data": {"scanBarcode": scanBarcode, "userId": userId}
+    // });
+    String url = "${baseUrl}/barcode/getReceivingItemList";
+    var response = await http.post(url,
+        body: <String, String>{"userId": userId, "scanBarcode": scanBarcode},
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'});
+    String responseBody = utf8.decode(response.bodyBytes);
+
+    var json = jsonDecode(responseBody);
+    var jsonList = json["list"];
+    if (json["result"] == "success") {
+      var list = jsonList
+          .map<receivingItem>((json) => receivingItem.fromJson(json))
+          .toList();
+
+      return list;
+    }
+    return null;
+  }
+
+  /**
+   * 파레트 바코드 기본리스트 호출
+   */
+  Future<List<Map<String, String>>> getPalletBarcodeList() async {
+    String url = "${baseUrl}/api/getPalletBarcodeList";
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody);
+    var jsonList = json["list"].cast<Map<String, dynamic>>();
+    // var list = jsonList.map<corCode>((json) => corCode.fromJson(json)).toList();
+    List<Map<String, String>> options = [];
+
+    // if (json["result"] == "success") {
+    //   for (var i = 0; i < jsonList.length; i++) {
+    //     options.add({
+    //       'value': list[i].subcode.toString(),
+    //       'title': list[i].codename.toString()
+    //     });
+    //   }
+    //   return options;
+    // }
+    return null;
+  }
+
+  /**
+   * 파레트 유형 리스트 호출
+   */
+  Future<List<String>> getPalletList() async {
+    String url = "${baseUrl}/barcode/getPalletList";
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody);
+    var jsonList = json["list"].cast<Map<String, dynamic>>();
+    List<String> list = List<String>();
+    for (var i = 0; i < jsonList.length; i++) {
+      list.add(jsonList[i]["codename"]);
+    }
+    return list;
+  }
+
+  /**
+   * 구역 리스트 호출
+   */
+  Future<List<String>> getZoneList() async {
+    String url = "${baseUrl}/barcode/getZoneList";
+    var response = await http.get(url, headers: header);
+
+    String responsBody = utf8.decode(response.bodyBytes);
+    var json = jsonDecode(responsBody);
+    var jsonList = json["list"].cast<Map<String, dynamic>>();
+    // var list = jsonList.map<corCode>((json) => corCode.fromJson(json)).toList();
+    List<String> list = List<String>();
+    for (var i = 0; i < jsonList.length; i++) {
+      list.add(jsonList[i]["storageZone"]);
     }
     return list;
   }
