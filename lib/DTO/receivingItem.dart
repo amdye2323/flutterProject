@@ -4,7 +4,7 @@ class receivingItem {
   String palletBarcode;
   String zoneBarcode;
   String palletType;
-  String checkButton;
+  String workingGubun;
 
   receivingItem(
       {this.sku,
@@ -12,15 +12,16 @@ class receivingItem {
       this.palletBarcode,
       this.zoneBarcode,
       this.palletType,
-      this.checkButton});
+      this.workingGubun});
 
   factory receivingItem.fromJson(Map<String, dynamic> json) {
     return receivingItem(
-        sku: json["sku"] as String,
-        qty: json["qty"] as int,
-        palletBarcode: json["palletBarcode"] as String,
-        zoneBarcode: json["zoneBarcode"] as String,
-        palletType: json["palletType"] as String,
-        checkButton: json["checkButton"] as String);
+      sku: json["sku"] as String,
+      qty: json["qty"] as int,
+      palletBarcode: json["palletBarcode"] as String,
+      zoneBarcode: json["zoneBarcode"] as String,
+      palletType: json["palletType"] as String,
+      workingGubun: json["workingGubun"] as String,
+    );
   }
 }

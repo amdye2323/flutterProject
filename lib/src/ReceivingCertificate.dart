@@ -19,17 +19,21 @@ class ReceivingCertificate extends StatefulWidget {
 
 class _ReceivingCertificateState extends State<ReceivingCertificate> {
   final _viewModel = HomeViewModel();
+  final skuController = TextEditingController();
   final qtyController = TextEditingController();
   var userId = "";
 
   String _scanBarcode = "";
   // int PalletCount = 0;
 
-  final _truckList = ["20T", "40T"];
-  String truck = "20T";
+  final _truckList = ["", "120T", "240T"];
+  final _workingGubun = ["", "수작업", "컨테이너(수작업)", "파레트", "컨테이너(파레트)", "파레트&수작업"];
+
+  String truck = "";
+  String working = "";
 
   Future<List<receivingItem>> receivingItemList;
-  Future<List<Map<String, String>>> palletBarcodeList;
+  // Future<List<Map<String, String>>> palletBarcodeList;
   Future<List<String>> palletList;
   Future<List<String>> zoneList;
 
@@ -37,6 +41,9 @@ class _ReceivingCertificateState extends State<ReceivingCertificate> {
   String palletType = "";
   List _zoneList = List<String>();
   String zone = "";
+  List<String> palletBarcodeList = List<String>();
+
+  List<receivingItem> reList = List<receivingItem>();
 
   @override
   void initState() {
@@ -46,11 +53,20 @@ class _ReceivingCertificateState extends State<ReceivingCertificate> {
     receivingItemList = _viewModel.getReceivingItemList(userId, _scanBarcode);
     palletList = _viewModel.getPalletList();
     zoneList = _viewModel.getZoneList();
+    callList();
   }
 
   void callList() async {
     _palletList = await palletList;
-    _zoneList = await palletList;
+    _zoneList = await zoneList;
+  }
+
+  void certificateList() async {
+    reList = await receivingItemList;
+    for(var i= 0;i<reList){
+
+    }
+    setState(() {});
   }
 
   Future<void> scanBarcodeNormal() async {
@@ -68,6 +84,7 @@ class _ReceivingCertificateState extends State<ReceivingCertificate> {
         _scanBarcode = barcodeScanRes;
         receivingItemList =
             _viewModel.getReceivingItemList(userId, _scanBarcode);
+        certificateList();
       });
     } else {
       showToastInstance("바코드를 확안해주세요.");
@@ -76,7 +93,82 @@ class _ReceivingCertificateState extends State<ReceivingCertificate> {
     if (!mounted) return;
   }
 
-  void reCall() {}
+  void addRow() {
+    setState(() {
+      reList.add(receivingItem(
+          sku: "선택해주세요",
+          palletType: "",
+          qty: 0,
+          palletBarcode: "",
+          workingGubun: "",
+          zoneBarcode: ""));
+    });
+  }
+
+  void qtyDialog(BuildContext context, int oriQty, int index) {
+    showDialog(
+        context: context,
+        barrierDismissible: false, //Dialog를 제외한 곳 터치시 x
+        builder: (BuildContext context) {
+          return AlertDialog(
+            //RoundedRectangleBorder 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "숫자를 입력해주세요",
+                  style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: Color(0xFF527DAA)),
+                ),
+              ],
+            ),
+            content: Container(
+              height: 100,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "원 수량 : ${oriQty}",
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  TextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter(RegExp('[0-9]'))
+                    ],
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: '수량',
+                    ),
+                    controller: qtyController,
+                  )
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      int newQty = int.parse(qtyController.text.toString());
+                      reList[index].qty = newQty;
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Text("등록하기")),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("닫기")),
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,163 +188,188 @@ class _ReceivingCertificateState extends State<ReceivingCertificate> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(child: normalTitle("입 고 증")),
+                        Container(
+                            child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: normalTitle("입 고 증"),
+                        )),
                         SizedBox(
                           width: 30,
                         ),
-                        _scanBarcode == ""
-                            ? scanButton(scanBarcodeNormal, "바코드 스캔")
-                            : barcodeName(
-                                context,
-                                _scanBarcode,
-                                Provider.of<UserModel>(context, listen: false)
-                                    .userId)
+                        Align(
+                            alignment: Alignment.centerRight,
+                            child: _scanBarcode == ""
+                                ? scanButton(scanBarcodeNormal, "바코드 스캔")
+                                : barcodeName(
+                                    context,
+                                    _scanBarcode,
+                                    Provider.of<UserModel>(context,
+                                            listen: false)
+                                        .userId)),
                       ],
                     ),
                   )),
               Expanded(
-                flex: 6,
+                flex: 5,
                 child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 20.0),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5.0),
-                        border: Border.all(color: Color(0xFF527DAA), width: 2)),
-                    child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: MediaQuery.of(context).size.height,
-                              minWidth: MediaQuery.of(context).size.width,
-                              maxHeight: MediaQuery.of(context).size.height,
-                              maxWidth: MediaQuery.of(context).size.width * 1.2,
-                            ),
-                            child: FutureBuilder(
-                              future: receivingItemList,
-                              builder: (BuildContext context, snapshot) {
-                                if (!snapshot.hasData) {
-                                  return Container(
-                                    alignment: Alignment.center,
-                                    child: Text("데이터가 없습니다."),
-                                  );
-                                } else if (snapshot.hasError) {
-                                  return Container(
-                                    child: CircularProgressIndicator(),
-                                  );
-                                } else if (snapshot.hasData) {
-                                  // PalletCount = snapshot.data[0].palletCount;
-                                  callList();
-                                  return ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: snapshot.data.length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return Container(
-                                          padding: EdgeInsets.all(5.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20.0,
-                                                    vertical: 10.0),
-                                                child: Text(
-                                                    "${snapshot.data[index].sku}"),
-                                              ),
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20.0,
-                                                    vertical: 10.0),
-                                                child: Text(
-                                                    "${snapshot.data[index].qty}"),
-                                              ),
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20.0,
-                                                    vertical: 10.0),
-                                                child: DropdownButton(
-                                                  value: truck,
-                                                  items:
-                                                      _truckList.map((value) {
-                                                    return DropdownMenuItem(
-                                                        value: value,
-                                                        child: Text(value));
-                                                  }).toList(),
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      truck = value;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20.0,
-                                                    vertical: 10.0),
-                                                child: DropdownButton(
-                                                  value: palletType,
-                                                  items:
-                                                      _palletList.map((value) {
-                                                    return DropdownMenuItem(
-                                                        value: value,
-                                                        child: Text(value));
-                                                  }).toList(),
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      palletType = value;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 20.0,
-                                                    vertical: 10.0),
-                                                child: DropdownButton(
-                                                  value: zone,
-                                                  items: _zoneList.map((value) {
-                                                    return DropdownMenuItem(
-                                                        value: value,
-                                                        child: Text(value));
-                                                  }).toList(),
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      zone = value;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                              snapshot.data[index]
-                                                          .checkButton ==
-                                                      'false'
-                                                  ? ElevatedButton(
-                                                      onPressed: () {},
-                                                      child: Text("확인"))
-                                                  : SizedBox(
-                                                      width: 20.0,
-                                                    ),
-                                            ],
+                  margin: EdgeInsets.symmetric(horizontal: 20.0),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5.0),
+                      border: Border.all(color: Color(0xFF527DAA), width: 2)),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height,
+                      minWidth: MediaQuery.of(context).size.width,
+                      maxHeight: MediaQuery.of(context).size.height,
+                      maxWidth: MediaQuery.of(context).size.width * 1.2,
+                    ),
+                    child: Container(
+                        child: reList.length == 0
+                            ? Container(
+                                alignment: Alignment.topCenter,
+                                child: Text("리스트가 존재하지 않습니다, 바코드 스캔을 해주세요."),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: reList.length,
+                                itemBuilder: (context, index) {
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Container(
+                                      padding: EdgeInsets.all(5.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 20.0,
+                                                vertical: 10.0),
+                                            child: Text("${index + 1} 번째 "),
                                           ),
-                                        );
-                                      });
-                                } else {
-                                  return Container(
-                                    child: CircularProgressIndicator(),
+                                          InkWell(
+                                            onTap: () {},
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 20.0,
+                                                  vertical: 10.0),
+                                              child:
+                                                  Text("${reList[index].sku}"),
+                                            ),
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              qtyDialog(context,
+                                                  reList[index].qty, index);
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 20.0,
+                                                  vertical: 10.0),
+                                              child:
+                                                  Text("${reList[index].qty}"),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 20.0,
+                                                vertical: 10.0),
+                                            child: DropdownButton(
+                                              value: reList[index].palletType,
+                                              items: _palletList.map((value) {
+                                                return DropdownMenuItem(
+                                                    value: value,
+                                                    child: Text(value));
+                                              }).toList(),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  reList[index].palletType =
+                                                      value;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 20.0,
+                                                vertical: 10.0),
+                                            child: DropdownButton(
+                                              value: reList[index].zoneBarcode,
+                                              items: _zoneList.map((value) {
+                                                return DropdownMenuItem(
+                                                    value: value,
+                                                    child: Text(value));
+                                              }).toList(),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  reList[index].zoneBarcode =
+                                                      value;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   );
-                                }
-                              },
-                            ),
-                          ),
-                        ))),
+                                })),
+                  ),
+                ),
               ),
-              Expanded(flex: 1, child: Container()),
+              Expanded(
+                  flex: 1,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Text("차 종류"),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 10.0),
+                        child: DropdownButton(
+                          value: truck,
+                          items: _truckList.map((value) {
+                            return DropdownMenuItem(
+                                value: value, child: Text(value));
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              truck = value;
+                            });
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        width: 30.0,
+                      ),
+                      Container(
+                        child: Text("작업 종류"),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 10.0),
+                        child: DropdownButton(
+                          value: working,
+                          items: _workingGubun.map((value) {
+                            return DropdownMenuItem(
+                                value: value, child: Text(value));
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              working = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+              // Expanded(flex: 1, child: Container()),
             ],
           ),
         ),
-        leftAlign(reCall, CupertinoIcons.refresh_bold, Alignment.bottomLeft),
-        leftAlign(reCall, CupertinoIcons.check_mark, Alignment.bottomRight),
+        leftAlign(addRow, CupertinoIcons.refresh_bold, Alignment.bottomLeft),
+        leftAlign(addRow, CupertinoIcons.check_mark, Alignment.bottomRight),
       ],
     );
   }
@@ -264,8 +381,8 @@ Widget barcodeName(BuildContext context, String barcode, String name) {
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(barcode),
-        Text(name),
+        Text("입고증 바코드 : [${barcode}]"),
+        Text("유저 명 [ ${name} ]"),
       ],
     ),
   );

@@ -453,6 +453,7 @@ class stockService {
     var json = jsonDecode(responsBody);
     var jsonList = json["list"].cast<Map<String, dynamic>>();
     List<String> list = List<String>();
+    list.add("없음");
     for (var i = 0; i < jsonList.length; i++) {
       list.add(jsonList[i]["codename"]);
     }
@@ -471,6 +472,7 @@ class stockService {
     var jsonList = json["list"].cast<Map<String, dynamic>>();
     // var list = jsonList.map<corCode>((json) => corCode.fromJson(json)).toList();
     List<String> list = List<String>();
+    list.add("");
     for (var i = 0; i < jsonList.length; i++) {
       list.add(jsonList[i]["storageZone"]);
     }
